@@ -31,13 +31,16 @@
       class="d-flex align-center justify-center"
       style="min-height: 900px"
     >
-      <iframe
+      <v-container fluid class="py-8 px-6">
+        <router-view />
+      </v-container>
+      <!-- <iframe
         :src="iframeUrl"
         frameborder="0"
         width="100%"
         height="100%"
         allowtransparency
-      ></iframe>
+      ></iframe> -->
     </v-main>
   </v-layout>
 </template>
