@@ -20,7 +20,7 @@
             <BarChart :cityId="city.id" />
           </v-card-text>
           <v-card-actions>
-            <v-btn color="primary"> View Details </v-btn>
+            <v-btn @click="goToCityDetail(city.id)" color="primary"> View Details </v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -48,6 +48,9 @@ export default {
     await this.fetchCities();
   },
   methods: {
+    goToCityDetail(id){
+      this.$router.push('/city-detail/'+id)
+    },
     async fetchCities() {
       try {
         const response = await axios.get(

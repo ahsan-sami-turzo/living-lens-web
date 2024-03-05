@@ -45,9 +45,13 @@
     <v-row>
     <v-col cols="8">
     <div class="d-flex">
-      <v-checkbox @change="getFinalExpenses($event,subCategory.average_price)"
-        :label="subCategory.subcategory_name"
-      ></v-checkbox>
+      <v-col cols="1">
+      <input type="checkbox" :checked="getCheckBoxValue(subCategory.id)" v-bind:false-value="0"
+                        v-bind:true-value="1" @change="getFinalExpenses($event,subCategory.average_price,subCategory.id)"
+        
+      ></v-col>
+      <v-col cols="11"><span>{{ subCategory.subcategory_name }}</span>
+      </v-col>
     </div>
   </v-col>
   <v-col style="align-self: center;text-align: right;" cols="4">
@@ -85,25 +89,32 @@
     data() {
       this.getCategories();
       return {
+        a:1,
         finalExpenses:0,
         categories: null,
         animations : null,
         subCategories: null,
+        checkedValues: {},
         cityName:this.$route.params.id==7 ? 'Helsinki' : 
         this.$route.params.id==8 ? 'Lappeenranta' : 'Lahti',
         citiesFinalExpenses: [0,0]
+        
       };
     },
     methods: {
-      getAnotherCityFinalExpenses(){
-        
+      getCheckBoxValue(id){
+        return this.checkedValues[id]!=null && this.checkedValues[id]==true ? true : false;
       },
-    getFinalExpenses(value,price){
+
+    getFinalExpenses(value,price,subCategoryId){
+      
       if(value.target.checked){
         this.finalExpenses+=price
+        this.checkedValues[subCategoryId] = true
       }
       else{
         this.finalExpenses-=price
+        this.checkedValues[subCategoryId] = false
       }
     },
     async getCategories() {

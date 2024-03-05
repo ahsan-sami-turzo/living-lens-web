@@ -16,6 +16,7 @@
 
 <script>
 import axios from "axios";
+import 'echarts/lib/component/legend';
 
 export default {
   name: "BarChart",
