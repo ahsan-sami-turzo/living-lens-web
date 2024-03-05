@@ -17,7 +17,14 @@
           <v-card-title>{{ city.city_name }}</v-card-title>
           <v-card-subtitle>Finland</v-card-subtitle>
           <v-card-text>
-            <BarChart :cityId="city.id" />
+            <v-row>
+              <v-col cols="6">
+                <PieChart :cityId="city.id" />
+              </v-col>
+              <v-col cols="6">
+                <BarChart :cityId="city.id" />
+              </v-col>
+            </v-row>
           </v-card-text>
           <v-card-actions>
             <v-btn color="primary"> View Details </v-btn>
@@ -31,6 +38,7 @@
 <script>
 import VueApexCharts from "vue3-apexcharts";
 import BarChart from "@/components/BarChart.vue";
+import PieChart from "@/components/PieChart.vue";
 import axios from "axios";
 
 export default {
@@ -38,6 +46,7 @@ export default {
   components: {
     apexchart: VueApexCharts,
     BarChart,
+    PieChart,
   },
   data() {
     return {
