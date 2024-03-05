@@ -10,6 +10,7 @@ declare module 'vue' {
     Admin: typeof import('./src/components/Admin.vue')['default']
     BarChart: typeof import('./src/components/BarChart.vue')['default']
     CitiesData: typeof import('./src/components/CitiesData.vue')['default']
+    CityDetail: typeof import('./src/components/CityDetail.vue')['default']
     Dashboard: typeof import('./src/components/Dashboard.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     Layout: typeof import('./src/components/Layout.vue')['default']

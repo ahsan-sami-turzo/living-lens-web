@@ -32,12 +32,15 @@ use([
   TransformComponent,
 ]);
 
+import Vue3Lottie from "vue3-lottie";
+
 // Types
 import type { App } from "vue";
 
 export function registerPlugins(app: App) {
   app.use(vuetify);
   app.use(router);
+  app.use(Vue3Lottie);
 
   app.component("apexchart", VueApexCharts);
   app.component("v-chart", ECharts);

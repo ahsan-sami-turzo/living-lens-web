@@ -27,7 +27,9 @@
             </v-row>
           </v-card-text>
           <v-card-actions>
-            <v-btn color="primary"> View Details </v-btn>
+            <v-btn color="primary" @click="goToCityDetails(city.id)">
+              View Details
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -57,6 +59,9 @@ export default {
     await this.fetchCities();
   },
   methods: {
+    goToCityDetails(cityId) {
+      this.$router.push({ name: "CityDetail", params: { id: cityId } });
+    },
     async fetchCities() {
       try {
         const response = await axios.get(
