@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Dashboard from "@/components/Dashboard.vue";
 import Admin from "@/components/Admin.vue";
+import CityDetail from "@/components/CityDetail.vue";
 
 const routes = [
   {
@@ -12,6 +13,11 @@ const routes = [
     path: "/admin",
     name: "Admin",
     component: Admin,
+  },
+  {
+    path: "/city-detail/:id",
+    name: "CityDetail",
+    component: CityDetail,
   },
 ];
 

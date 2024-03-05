@@ -7,16 +7,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@lottiefiles/vue-lottie-player": "^1.1.0",
     "@mdi/font": "7.0.96",
     "apexcharts": "^3.46.0",
     "axios": "^1.6.7",
     "echarts": "^5.5.0",
     "jsonwebtoken": "^9.0.2",
+    "lottie-vuejs": "^0.3.6",
+    "lottie-web-vue": "^2.0.7",
     "roboto-fontface": "*",
     "vue": "^3.3.0",
     "vue-echarts": "^6.6.9",
     "vue-router": "4",
     "vue3-apexcharts": "^1.5.2",
+    "vue3-lottie": "^3.2.0",
     "vuetify": "^3.0.0"
   },
   "devDependencies": {
