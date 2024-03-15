@@ -15,6 +15,7 @@
           {{ this.cityName }}
         </span>
       </v-col>
+
       <v-col cols="6">
         <v-row
           v-for="(category, index) in this.categories"
@@ -86,6 +87,20 @@
         </v-row>
       </v-col>
       <v-col cols="6" style="text-align: center">
+         <v-btn color="primary">{{currencyTitle}}
+
+      <v-menu activator="parent">
+        <v-list style="max-height:300px;overflow:auto">
+          <v-list-item
+            v-for="(currency, index) in currencies"
+            :key="index"
+            :value="index"
+          >
+            <v-list-item-title @click="changeCurrency(currency)">{{ currency }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </v-btn>
         <div>
           <span style="font-size: 30px"
             >Your Expenses:
@@ -102,6 +117,7 @@
 <script>
 import axios from "axios";
 import VueApexCharts from "vue3-apexcharts";
+import Freecurrencyapi from '@everapi/freecurrencyapi-js';
 
 export default {
   name: "CityDetail",
@@ -112,6 +128,16 @@ export default {
     this.getCategories();
     return {
       a: 1,
+      currencyTitle: "EUR",
+      currencies:["EUR €", "USD $", "JPY ¥", "BGN лв", "CZK Kč", "DKK kr", "GBP £", "HUF Ft",
+                "PLN zł", "RON lei", "SEK kr", "CHF CHF", "ISK kr", "NOK kr", "RUB ₽", "TRY ₺",
+                "AUD $", "BRL R$","CAD $", "CNY ¥", "HKD $", "IDR Rp", "ILS ₪", "INR Rs", "KRW ₩",
+                "MXN $", "MYR RM", "NZD $", "PHP ₱", "SGD $", "THB ฿", "ZAR R"],
+      allCurrencyRatios: {},
+      currentCurrency: {
+        "title": "EUR",
+        "ratio": 1,
+      },
       finalExpenses: 0,
       categories: null,
       animations: null,
@@ -126,7 +152,11 @@ export default {
       citiesFinalExpenses: [0, 0],
     };
   },
+  mounted(){
+    this.getAllCurrencyRatio()
+  },
   methods: {
+    
     getCheckBoxValue(id) {
       return this.checkedValues[id] != null && this.checkedValues[id] == true
         ? true
@@ -174,6 +204,245 @@ export default {
         this.categories[categoryId - 1]["sub"] = null;
       }
     },
+    getAllCurrencyRatio(){
+      const freecurrencyapi = new Freecurrencyapi('fca_live_9ztRlxjMVYB7PnVHzHDHDUSbVe0krUGZFNtj2QiQ');
+      freecurrencyapi.latest({
+        base_currency: 'EUR',
+        currencies: "EUR,USD,JPY,BGN,CZK,DKK,GBP,HUF,PLN,RON,SEK,CHF,ISK,NOR,RUB," +
+         "TRY,AUD,BRL,CAD,CNY,HKD,IDR,ILS,INR,KRW,MXN,MYR,NZD,PHP,SGD,THB,ZAR"
+    }).then(res => {
+      this.allCurrencyRatios = res.data;
+      console.log(this.allCurrencyRatios.USD);
+    });
+    
+    },
+    changeCurrency(currency){
+      var newRatio=0;
+      if(currency=="EUR"){
+        newRatio = this.allCurrencyRatios.EUR/this.currentCurrency.ratio;
+        this.currentCurrency.title="EUR";
+        this.currencyTitle="EUR";
+        this.currentCurrency.ratio= newRatio;
+        this.finalExpenses = this.finalExpenses * newRatio;
+      }
+      else if(currency == "USD"){
+        newRatio = this.allCurrencyRatios.USD/this.currentCurrency.ratio;
+        this.currentCurrency.title="USD";
+        this.currencyTitle="USD";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses =this.finalExpenses * newRatio ;
+      }
+      else if(currency == "JPY"){
+        newRatio = this.allCurrencyRatios.JPY/this.currentCurrency.ratio;
+        this.currentCurrency.title="JPY";
+        this.currencyTitle="JPY";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "BGN"){
+        newRatio = this.allCurrencyRatios.BGN/this.currentCurrency.ratio;
+        this.currentCurrency.title="BGN";
+        this.currencyTitle="BGN";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "CZK"){
+        newRatio = this.allCurrencyRatios.CZK/this.currentCurrency.ratio;
+        this.currentCurrency.title="CZK";
+        this.currencyTitle="CZK";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;  
+      }
+       else if(currency == "DKK"){
+        newRatio = this.allCurrencyRatios.DKK/this.currentCurrency.ratio;
+        this.currentCurrency.title="DKK";
+        this.currencyTitle="DKK";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = this.finalExpenses * newRatio;
+      }
+       else if(currency == "GBP"){
+        newRatio = this.allCurrencyRatios.GBP/this.currentCurrency.ratio;
+        this.currentCurrency.title="GBP";
+        this.currencyTitle="GBP";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = this.finalExpenses * newRatio;
+      }
+       else if(currency == "HUF"){
+        newRatio = this.allCurrencyRatios.HUF/this.currentCurrency.ratio;
+        this.currentCurrency.title="HUF";
+        this.currencyTitle="HUF";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "PLN"){
+        newRatio = this.allCurrencyRatios.PLN/this.currentCurrency.ratio;
+        this.currentCurrency.title="PLN";
+        this.currencyTitle="PLN";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+       else if(currency == "RON"){
+        newRatio = this.allCurrencyRatios.RON/this.currentCurrency.ratio;
+        this.currentCurrency.title="RON";
+        this.currencyTitle="RON";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+       else if(currency == "SEK"){
+        newRatio = this.allCurrencyRatios.SEK/this.currentCurrency.ratio;
+        this.currentCurrency.title="SEK";
+        this.currencyTitle="SEK";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "CHF"){
+        newRatio = this.allCurrencyRatios.CHF/this.currentCurrency.ratio;
+        this.currentCurrency.title="CHF";
+        this.currencyTitle="CHF";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "ISK"){
+        newRatio = this.allCurrencyRatios.ISK/this.currentCurrency.ratio;
+        this.currentCurrency.title="ISK";
+        this.currencyTitle="ISK";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "NOK"){
+        newRatio = this.allCurrencyRatios.NOK/this.currentCurrency.ratio;
+        this.currentCurrency.title="NOK";
+        this.currencyTitle="NOK";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "RUB"){
+        newRatio = this.allCurrencyRatios.RUB/this.currentCurrency.ratio;
+        this.currentCurrency.title="RUB";
+        this.currencyTitle="RUB";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "TRY"){
+        newRatio = this.allCurrencyRatios.TRY/this.currentCurrency.ratio;
+        this.currentCurrency.title="TRY";
+        this.currencyTitle="TRY";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "AUD"){
+        newRatio = this.allCurrencyRatios.AUD/this.currentCurrency.ratio;
+        this.currentCurrency.title="AUD";
+        this.currencyTitle="AUD";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "BRL"){
+        newRatio = this.allCurrencyRatios.BRL/this.currentCurrency.ratio;
+        this.currentCurrency.title="BRL";
+        this.currencyTitle="BRL";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "CAD"){
+        newRatio = this.allCurrencyRatios.CAD/this.currentCurrency.ratio;
+        this.currentCurrency.title="CAD";
+        this.currencyTitle="CAD";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "CNY"){
+        newRatio = this.allCurrencyRatios.CNY/this.currentCurrency.ratio;
+        this.currentCurrency.title="CNY";
+        this.currencyTitle="CNY";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "HKD"){
+        newRatio = this.allCurrencyRatios.HKD/this.currentCurrency.ratio;
+        this.currentCurrency.title="HKD";
+        this.currencyTitle="HKD";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "IDR"){
+        newRatio = this.allCurrencyRatios.IDR/this.currentCurrency.ratio;
+        this.currentCurrency.title="IDR";
+        this.currencyTitle="IDR";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "ILS"){
+        newRatio = this.allCurrencyRatios.ILS/this.currentCurrency.ratio;
+        this.currentCurrency.title="ILS";
+        this.currencyTitle="ILS";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "INR"){
+        newRatio = this.allCurrencyRatios.INR/this.currentCurrency.ratio;
+        this.currentCurrency.title="INR";
+        this.currencyTitle="INR";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "KRW"){
+        newRatio = this.allCurrencyRatios.KRW/this.currentCurrency.ratio;
+        this.currentCurrency.title="KRW";
+        this.currencyTitle="KRW";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "MXN"){
+        newRatio = this.allCurrencyRatios.MXN/this.currentCurrency.ratio;
+        this.currentCurrency.title="MXN";
+        this.currencyTitle="MXN";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "MYR"){
+        newRatio = this.allCurrencyRatios.MYR/this.currentCurrency.ratio;
+        this.currentCurrency.title="MYR";
+        this.currencyTitle="MYR";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "NZD"){
+        newRatio = this.allCurrencyRatios.NZD/this.currentCurrency.ratio;
+        this.currentCurrency.title="NZD";
+        this.currencyTitle="NZD";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "PHP"){
+        newRatio = this.allCurrencyRatios.PHP/this.currentCurrency.ratio;
+        this.currentCurrency.title="PHP";
+        this.currencyTitle="PHP";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "SGD"){
+        newRatio = this.allCurrencyRatios.SGD/this.currentCurrency.ratio;
+        this.currentCurrency.title="SGD";
+        this.currencyTitle="SGD";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+      else if(currency == "THB"){
+        newRatio = this.allCurrencyRatios.THB/this.currentCurrency.ratio;
+        this.currentCurrency.title="THB";
+        this.currencyTitle="THB";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+    else if(currency == "ZAR"){
+        newRatio = this.allCurrencyRatios.ZAR/this.currentCurrency.ratio;
+        this.currentCurrency.title="ZAR";
+        this.currencyTitle="ZAR";
+        this.currentCurrency.ratio = newRatio;
+        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      }
+    }
   },
 };
 </script>
