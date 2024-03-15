@@ -6,8 +6,9 @@
           clearable
           chips
           label="Select Country"
-          :items="['Finland', 'Sweden', 'Norway', 'Denmark']"
+          :items="['Finland', 'Germany', 'Italy']"
           variant="outlined"
+          @change="updateList"
         ></v-combobox>
       </v-col>
     </v-row>
@@ -52,13 +53,18 @@ export default {
   },
   data() {
     return {
+      selectedCity: null,
       cities: [],
     };
   },
   async created() {
+    this.selectedCity = "Finland";
     await this.fetchCities();
   },
   methods: {
+    updateList() {
+      console.log("CITY: ", this.selectedCity);
+    },
     goToCityDetails(cityId) {
       this.$router.push({ name: "CityDetail", params: { id: cityId } });
     },
