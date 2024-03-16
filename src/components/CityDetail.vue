@@ -6,14 +6,49 @@
   padding: 5px;
   max-width: 100% !important;
 }
+.v-expansion-panels{
+position: absolute !important;
+    z-index: 3 !important;
+    width: 300px !important;
+}
+.v-expansion-panels{
+max-height: 200px !important;
+overflow: auto;
+}
+.v-btn{
+  background-color: white !important;
+    color: black !important;
+    width: 250px;
+}
+.v-row{
+  margin: 0 !important;
+}
+
 </style>
 <template>
   <v-container>
     <v-row>
       <v-col cols="12">
+        <v-row style="justify-content: space-between;">
         <span style="font-size: 25px; font-weight: bold">
           {{ this.cityName }}
         </span>
+        <v-btn style="width: auto !important" color="primary">{{currentCurrency.title}}
+
+<v-menu activator="parent">
+  <v-list style="max-height:300px;overflow:auto">
+    <v-list-item
+      v-for="(currency, index) in currencies"
+      :key="index"
+      :value="index"
+    >
+      <v-list-item-title @click="changeCurrency(currency)">{{ currency }}</v-list-item-title>
+    </v-list-item>
+  </v-list>
+</v-menu>
+
+</v-btn>
+</v-row>
       </v-col>
 
       <v-col cols="6">
@@ -22,32 +57,33 @@
           :key="category.id"
           data-test="category"
         >
-          <v-col cols="4">
-            <Vue3Lottie
+        <div v-if="index%2==0">
+          <v-row>
+        <v-col cols="6">
+          <v-col style="height: 100%;">
+          <Vue3Lottie
               ref="customControl"
-              :animationData="AnimateJSON"
+              
               :animationLink="animations[index]"
               :loop="true"
               :speed="1"
               :autoPlay="true"
-              :direction="forward"
               :pauseAnimation="true"
               :pauseOnHover="true"
             />
-          </v-col>
-          <v-col cols="8" style="align-self: center">
-            <v-expansion-panels>
-              <v-expansion-panel>
-                <v-expansion-header @click="getSubcategories(category.id)"
-                  ><v-btn style="width: 100%" append-icon="mdi-arrow-down">
-                    {{ category.name }}
-                  </v-btn></v-expansion-header
-                >
-                <v-expansion-panel-content
-                  v-for="subCategory in categories[category.id - 1].sub"
+            <v-btn>
+              {{ this.categories[index].name }}
+
+<v-menu activator="parent">
+  <v-list style="max-height:300px;overflow:auto">
+    <v-list-item
+    v-for="subCategory in categories[this.categories[index].id - 1].sub"
                   :key="subCategory.id"
-                >
-                  <div style="padding: 10px">
+                  
+            :value="index"
+    >
+      <v-list-item-title>
+        <div style="padding: 10px">
                     <v-row>
                       <v-col cols="8">
                         <div class="d-flex">
@@ -58,7 +94,7 @@
                               v-bind:false-value="0"
                               v-bind:true-value="1"
                               @change="
-                                getFinalExpenses(
+                                calculateExpenses(
                                   $event,
                                   subCategory.average_price,
                                   subCategory.id
@@ -75,40 +111,156 @@
                         cols="4"
                       >
                         <span style="color: green"
-                          >{{ subCategory.average_price }} €</span
+                          >{{ (subCategory.average_price * currentCurrency.ratio).toFixed(2) }} {{ currentCurrency.title.split(" ")[1] }}</span
                         >
                       </v-col>
                     </v-row>
                   </div>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </v-expansion-panels>
+      </v-list-item-title>
+    </v-list-item>
+  </v-list>
+</v-menu>
+</v-btn>
+           
+        </v-col>
+      </v-col>
+
+        <v-col cols="6">
+          <v-col style="height: 100%;">
+          <Vue3Lottie v-if="index  <= this.categories.length-2"
+              ref="customControl"
+              
+              :animationLink="animations[index + 1]"
+              :loop="true"
+              :speed="1"
+              :autoPlay="true"
+              :pauseAnimation="true"
+              :pauseOnHover="true"
+            />
+            <v-btn v-if="index <= this.categories.length-2">
+              {{ this.categories[index+1].name }}
+
+<v-menu activator="parent">
+  <v-list style="max-height:300px;overflow:auto">
+    <v-list-item
+    v-for="subCategory in categories[this.categories[index+1].id - 1].sub"
+                  :key="subCategory.id"
+                  
+            :value="index"
+    >
+      <v-list-item-title>
+        <div style="padding: 10px">
+                    <v-row>
+                      <v-col cols="8">
+                        <div class="d-flex">
+                          <v-col cols="1">
+                            <input
+                              type="checkbox"
+                              :checked="getCheckBoxValue(subCategory.id)"
+                              v-bind:false-value="0"
+                              v-bind:true-value="1"
+                              @change="
+                                calculateExpenses(
+                                  $event,
+                                  subCategory.average_price,
+                                  subCategory.id
+                                )
+                              "
+                          /></v-col>
+                          <v-col cols="11"
+                            ><span>{{ subCategory.subcategory_name }}</span>
+                          </v-col>
+                        </div>
+                      </v-col>
+                      <v-col
+                        style="align-self: center; text-align: right"
+                        cols="4"
+                      >
+                        <span style="color: green"
+                          >{{ (subCategory.average_price * currentCurrency.ratio).toFixed(2) }} {{ currentCurrency.title.split(" ")[1] }}</span
+                        >
+                      </v-col>
+                    </v-row>
+                  </div>
+      </v-list-item-title>
+    </v-list-item>
+  </v-list>
+</v-menu>
+</v-btn>
           </v-col>
+        </v-col>
+      </v-row>
+      </div>
         </v-row>
       </v-col>
-      <v-col cols="6" style="text-align: center">
-         <v-btn color="primary">{{currencyTitle}}
-
-      <v-menu activator="parent">
-        <v-list style="max-height:300px;overflow:auto">
-          <v-list-item
-            v-for="(currency, index) in currencies"
-            :key="index"
-            :value="index"
+      <v-col cols="6" style="text-align: center"> 
+        <v-row style="place-content: center;">
+          <span style="font-size: 30px;font-weight: bold;padding: 25px;"
+            >Expenses</span
           >
-            <v-list-item-title @click="changeCurrency(currency)">{{ currency }}</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-    </v-btn>
-        <div>
-          <span style="font-size: 30px"
-            >Your Expenses:
-            <span style="font-weight: bold; font-size: 40px"
-              >{{ finalExpenses }} €</span
-            ></span
-          >
-        </div>
+        </v-row>
+          <v-row>
+            <v-col cols="3">
+              <v-row style="place-content: center;">
+              <span>
+                Yearly
+              </span>
+            </v-row>
+            <v-row style="padding-top: 15px;">
+              <div style="width:100%;display: flex;align-items: center;
+    justify-content: center;;background-color: #004e00;border-radius: 5px;color: white;height: 40px;">
+                <span style="font-weight: bold;">
+                  {{ (finalExpenses * 12 * currentCurrency.ratio).toFixed(2)  }}
+                </span>
+              </div>
+            </v-row>
+            </v-col>
+            <v-col cols="3">
+              <v-row style="place-content: center;">
+              <span>
+                Monthly
+              </span>
+            </v-row>
+            <v-row style="padding-top: 15px;">
+              <div style="width:100%;display: flex;align-items: center;
+    justify-content: center;;background-color: #004e00;border-radius: 5px;color: white;height: 40px;">
+                <span style="font-weight: bold;">
+                  {{ (finalExpenses * currentCurrency.ratio / 1).toFixed(2)  }}
+                </span>
+              </div>
+            </v-row>
+            </v-col>
+            <v-col cols="3">
+              <v-row style="place-content: center;">
+              <span>
+                Weekly
+              </span>
+            </v-row>
+            <v-row style="padding-top: 15px;">
+              <div style="width:100%;display: flex;align-items: center;
+    justify-content: center;;background-color: #004e00;border-radius: 5px;color: white;height: 40px;">
+                <span style="font-weight: bold;">
+                  {{ (finalExpenses * currentCurrency.ratio / 4).toFixed(2) }}
+                </span>
+              </div>
+            </v-row>
+            </v-col>
+            <v-col cols="3">
+              <v-row style="place-content: center;">
+              <span>
+                Daily
+              </span>
+            </v-row>
+            <v-row style="padding-top: 15px;">
+              <div style="width:100%;display: flex;align-items: center;
+    justify-content: center;;background-color: #004e00;border-radius: 5px;color: white;height: 40px;">
+                <span style="font-weight: bold;">
+                  {{ (finalExpenses * currentCurrency.ratio / 30).toFixed(2) }}
+                </span>
+              </div>
+            </v-row>
+            </v-col>
+          </v-row>
       </v-col>
     </v-row>
   </v-container>
@@ -125,17 +277,12 @@ export default {
     apexchart: VueApexCharts,
   },
   data() {
-    this.getCategories();
+    
     return {
       a: 1,
-      currencyTitle: "EUR",
-      currencies:["EUR €", "USD $", "JPY ¥", "BGN лв", "CZK Kč", "DKK kr", "GBP £", "HUF Ft",
-                "PLN zł", "RON lei", "SEK kr", "CHF CHF", "ISK kr", "NOK kr", "RUB ₽", "TRY ₺",
-                "AUD $", "BRL R$","CAD $", "CNY ¥", "HKD $", "IDR Rp", "ILS ₪", "INR Rs", "KRW ₩",
-                "MXN $", "MYR RM", "NZD $", "PHP ₱", "SGD $", "THB ฿", "ZAR R"],
       allCurrencyRatios: {},
       currentCurrency: {
-        "title": "EUR",
+        "title": "EUR €",
         "ratio": 1,
       },
       finalExpenses: 0,
@@ -150,9 +297,14 @@ export default {
           ? "Lappeenranta"
           : "Lahti",
       citiesFinalExpenses: [0, 0],
+      currencies:["EUR €", "USD $", "JPY ¥", "BGN лв", "CZK Kč", "DKK kr", "GBP £", "HUF Ft",
+                "PLN zł", "RON lei", "SEK kr", "CHF CHF", "ISK kr", "NOK kr", "RUB ₽", "TRY ₺",
+                "AUD $", "BRL R$","CAD $", "CNY ¥", "HKD $", "IDR Rp", "ILS ₪", "INR Rs", "KRW ₩",
+                "MXN $", "MYR RM", "NZD $", "PHP ₱", "SGD $", "THB ฿", "ZAR R"],
     };
   },
   mounted(){
+    this.getCategories();
     this.getAllCurrencyRatio()
   },
   methods: {
@@ -163,7 +315,7 @@ export default {
         : false;
     },
 
-    getFinalExpenses(value, price, subCategoryId) {
+    calculateExpenses(value, price, subCategoryId) {
       if (value.target.checked) {
         this.finalExpenses += price;
         this.checkedValues[subCategoryId] = true;
@@ -173,9 +325,9 @@ export default {
       }
     },
     async getCategories() {
-      this.categories = (
-        await axios.get("http://localhost:8080/api/v1/get-categories/")
-      ).data;
+      this.categories =
+        await axios.get("http://localhost:8080/api/v1/get-categories/");
+      this.categories = this.categories.data;
       this.categories.splice(9, 1);
       this.animations = [
         "https://lottie.host/b2609a02-bcb1-4621-bdbf-4ca667b01d5f/qKaKzOePbQ.json",
@@ -188,28 +340,31 @@ export default {
         "https://lottie.host/be3607c6-3076-4636-89f7-c1e989357057/Z6MNDuXfeK.json",
         "https://lottie.host/d1e69b6d-e09d-42c9-95e6-990d06b006ee/JyDcnADyUH.json",
       ];
+      this.getSubcategories();
     },
-    async getSubcategories(categoryId) {
-      if (this.categories[categoryId - 1]["sub"] == null) {
+    async getSubcategories() {
+      for (let category of this.categories){
+      if (this.categories[category.id - 1]["sub"] == null) {
         this.subCategories = (
           await axios.get(
             "http://localhost:8080/api/v1/get-subcategories-by-city-and-category/" +
               this.$route.params.id +
               "/" +
-              categoryId
+              category.id
           )
         ).data;
-        this.categories[categoryId - 1]["sub"] = this.subCategories;
+        this.categories[category.id - 1]["sub"] = this.subCategories;
       } else {
-        this.categories[categoryId - 1]["sub"] = null;
+        this.categories[category.id - 1]["sub"] = null;
       }
-    },
+    }
+    
+  },
     getAllCurrencyRatio(){
       const freecurrencyapi = new Freecurrencyapi('fca_live_9ztRlxjMVYB7PnVHzHDHDUSbVe0krUGZFNtj2QiQ');
       freecurrencyapi.latest({
         base_currency: 'EUR',
-        currencies: "EUR,USD,JPY,BGN,CZK,DKK,GBP,HUF,PLN,RON,SEK,CHF,ISK,NOR,RUB," +
-         "TRY,AUD,BRL,CAD,CNY,HKD,IDR,ILS,INR,KRW,MXN,MYR,NZD,PHP,SGD,THB,ZAR"
+        currencies: ""
     }).then(res => {
       this.allCurrencyRatios = res.data;
       console.log(this.allCurrencyRatios.USD);
@@ -217,230 +372,133 @@ export default {
     
     },
     changeCurrency(currency){
-      var newRatio=0;
-      if(currency=="EUR"){
-        newRatio = this.allCurrencyRatios.EUR/this.currentCurrency.ratio;
-        this.currentCurrency.title="EUR";
-        this.currencyTitle="EUR";
-        this.currentCurrency.ratio= newRatio;
-        this.finalExpenses = this.finalExpenses * newRatio;
+      if(currency=="EUR €"){
+        this.currentCurrency.title="EUR €";
+        this.currentCurrency.ratio= 1;
       }
-      else if(currency == "USD"){
-        newRatio = this.allCurrencyRatios.USD/this.currentCurrency.ratio;
-        this.currentCurrency.title="USD";
-        this.currencyTitle="USD";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses =this.finalExpenses * newRatio ;
+      else if(currency == "USD $"){
+        this.currentCurrency.title="USD $";
+        this.currentCurrency.ratio = this.allCurrencyRatios.USD;
       }
-      else if(currency == "JPY"){
-        newRatio = this.allCurrencyRatios.JPY/this.currentCurrency.ratio;
-        this.currentCurrency.title="JPY";
-        this.currencyTitle="JPY";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "JPY ¥"){
+        this.currentCurrency.title="JPY ¥";
+        this.currentCurrency.ratio = this.allCurrencyRatios.JPY;
       }
-      else if(currency == "BGN"){
-        newRatio = this.allCurrencyRatios.BGN/this.currentCurrency.ratio;
-        this.currentCurrency.title="BGN";
-        this.currencyTitle="BGN";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "BGN лв"){
+        this.currentCurrency.title="BGN лв";
+        this.currentCurrency.ratio = this.allCurrencyRatios.BGN;
       }
-      else if(currency == "CZK"){
-        newRatio = this.allCurrencyRatios.CZK/this.currentCurrency.ratio;
-        this.currentCurrency.title="CZK";
-        this.currencyTitle="CZK";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;  
+      else if(currency == "CZK Kč"){
+        this.currentCurrency.title="CZK Kč";
+        this.currentCurrency.ratio = this.allCurrencyRatios.CZK; 
       }
-       else if(currency == "DKK"){
-        newRatio = this.allCurrencyRatios.DKK/this.currentCurrency.ratio;
-        this.currentCurrency.title="DKK";
-        this.currencyTitle="DKK";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = this.finalExpenses * newRatio;
+       else if(currency == "DKK kr"){
+        this.currentCurrency.title="DKK kr";
+        this.currentCurrency.ratio = this.allCurrencyRatios.DKK;
       }
-       else if(currency == "GBP"){
-        newRatio = this.allCurrencyRatios.GBP/this.currentCurrency.ratio;
-        this.currentCurrency.title="GBP";
-        this.currencyTitle="GBP";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = this.finalExpenses * newRatio;
+       else if(currency == "GBP £"){
+        this.currentCurrency.title="GBP £";
+        this.currentCurrency.ratio = this.allCurrencyRatios.GBP;
       }
-       else if(currency == "HUF"){
-        newRatio = this.allCurrencyRatios.HUF/this.currentCurrency.ratio;
-        this.currentCurrency.title="HUF";
-        this.currencyTitle="HUF";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+       else if(currency == "HUF Ft"){
+        this.currentCurrency.title="HUF Ft";
+        this.currentCurrency.ratio = this.allCurrencyRatios.HUF;
       }
-      else if(currency == "PLN"){
-        newRatio = this.allCurrencyRatios.PLN/this.currentCurrency.ratio;
-        this.currentCurrency.title="PLN";
-        this.currencyTitle="PLN";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "PLN zł"){
+        this.currentCurrency.title="PLN zł";
+        this.currentCurrency.ratio = this.allCurrencyRatios.PLN;
       }
-       else if(currency == "RON"){
-        newRatio = this.allCurrencyRatios.RON/this.currentCurrency.ratio;
-        this.currentCurrency.title="RON";
-        this.currencyTitle="RON";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+       else if(currency == "RON lei"){
+        this.currentCurrency.title="RON lei";
+        this.currentCurrency.ratio = this.allCurrencyRatios.RON;
       }
-       else if(currency == "SEK"){
-        newRatio = this.allCurrencyRatios.SEK/this.currentCurrency.ratio;
-        this.currentCurrency.title="SEK";
-        this.currencyTitle="SEK";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+       else if(currency == "SEK kr"){
+        this.currentCurrency.title="SEK kr";
+        this.currentCurrency.ratio = this.allCurrencyRatios.SEK;
       }
-      else if(currency == "CHF"){
-        newRatio = this.allCurrencyRatios.CHF/this.currentCurrency.ratio;
-        this.currentCurrency.title="CHF";
-        this.currencyTitle="CHF";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "CHF CHF"){
+        this.currentCurrency.title="CHF CHF";
+        this.currentCurrency.ratio = this.allCurrencyRatios.CHF;
       }
-      else if(currency == "ISK"){
-        newRatio = this.allCurrencyRatios.ISK/this.currentCurrency.ratio;
-        this.currentCurrency.title="ISK";
-        this.currencyTitle="ISK";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "ISK kr"){
+        this.currentCurrency.title="ISK kr";
+        this.currentCurrency.ratio = this.allCurrencyRatios.ISK;
       }
-      else if(currency == "NOK"){
-        newRatio = this.allCurrencyRatios.NOK/this.currentCurrency.ratio;
-        this.currentCurrency.title="NOK";
-        this.currencyTitle="NOK";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "NOK kr"){
+        this.currentCurrency.title="NOK kr";
+        this.currentCurrency.ratio = this.allCurrencyRatios.NOK;
       }
-      else if(currency == "RUB"){
-        newRatio = this.allCurrencyRatios.RUB/this.currentCurrency.ratio;
-        this.currentCurrency.title="RUB";
-        this.currencyTitle="RUB";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "RUB ₽"){
+        this.currentCurrency.title="RUB ₽";
+        this.currentCurrency.ratio = this.allCurrencyRatios.RUB;
       }
-      else if(currency == "TRY"){
-        newRatio = this.allCurrencyRatios.TRY/this.currentCurrency.ratio;
-        this.currentCurrency.title="TRY";
-        this.currencyTitle="TRY";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "TRY ₺"){
+        this.currentCurrency.title="TRY ₺";
+        this.currentCurrency.ratio = this.allCurrencyRatios.TRY;
       }
-      else if(currency == "AUD"){
-        newRatio = this.allCurrencyRatios.AUD/this.currentCurrency.ratio;
-        this.currentCurrency.title="AUD";
-        this.currencyTitle="AUD";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "AUD $"){
+        this.currentCurrency.title="AUD $";
+        this.currentCurrency.ratio = this.allCurrencyRatios.AUD;
       }
-      else if(currency == "BRL"){
-        newRatio = this.allCurrencyRatios.BRL/this.currentCurrency.ratio;
-        this.currentCurrency.title="BRL";
-        this.currencyTitle="BRL";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "BRL R$"){
+        this.currentCurrency.title="BRL R$";
+        this.currentCurrency.ratio = this.allCurrencyRatios.BRL;
       }
-      else if(currency == "CAD"){
-        newRatio = this.allCurrencyRatios.CAD/this.currentCurrency.ratio;
-        this.currentCurrency.title="CAD";
-        this.currencyTitle="CAD";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "CAD $"){
+        this.currentCurrency.title="CAD $";
+        this.currentCurrency.ratio = this.allCurrencyRatios.CAD;
       }
-      else if(currency == "CNY"){
-        newRatio = this.allCurrencyRatios.CNY/this.currentCurrency.ratio;
-        this.currentCurrency.title="CNY";
-        this.currencyTitle="CNY";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "CNY ¥"){
+        this.currentCurrency.title="CNY ¥";
+        this.currentCurrency.ratio = this.allCurrencyRatios.CNY;
       }
-      else if(currency == "HKD"){
-        newRatio = this.allCurrencyRatios.HKD/this.currentCurrency.ratio;
-        this.currentCurrency.title="HKD";
-        this.currencyTitle="HKD";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "HKD $"){
+        this.currentCurrency.title="HKD $";
+        this.currentCurrency.ratio = this.allCurrencyRatios.HKD;
       }
-      else if(currency == "IDR"){
-        newRatio = this.allCurrencyRatios.IDR/this.currentCurrency.ratio;
-        this.currentCurrency.title="IDR";
-        this.currencyTitle="IDR";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "IDR Rp"){
+        this.currentCurrency.title="IDR Rp";
+        this.currentCurrency.ratio = this.allCurrencyRatios.IDR;
       }
-      else if(currency == "ILS"){
-        newRatio = this.allCurrencyRatios.ILS/this.currentCurrency.ratio;
-        this.currentCurrency.title="ILS";
-        this.currencyTitle="ILS";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "ILS ₪"){
+        this.currentCurrency.title="ILS ₪";
+        this.currentCurrency.ratio = this.allCurrencyRatios.ILS;
       }
-      else if(currency == "INR"){
-        newRatio = this.allCurrencyRatios.INR/this.currentCurrency.ratio;
-        this.currentCurrency.title="INR";
-        this.currencyTitle="INR";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "INR Rs"){
+        this.currentCurrency.title="INR Rs";
+        this.currentCurrency.ratio = this.allCurrencyRatios.INR;
       }
-      else if(currency == "KRW"){
-        newRatio = this.allCurrencyRatios.KRW/this.currentCurrency.ratio;
-        this.currentCurrency.title="KRW";
-        this.currencyTitle="KRW";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "KRW ₩"){
+        this.currentCurrency.title="KRW ₩";
+        this.currentCurrency.ratio = this.allCurrencyRatios.KRW;
       }
-      else if(currency == "MXN"){
-        newRatio = this.allCurrencyRatios.MXN/this.currentCurrency.ratio;
-        this.currentCurrency.title="MXN";
-        this.currencyTitle="MXN";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "MXN $"){
+        this.currentCurrency.title="MXN $";
+        this.currentCurrency.ratio = this.allCurrencyRatios.MXN;
       }
-      else if(currency == "MYR"){
-        newRatio = this.allCurrencyRatios.MYR/this.currentCurrency.ratio;
-        this.currentCurrency.title="MYR";
-        this.currencyTitle="MYR";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "MYR RM"){
+        this.currentCurrency.title="MYR RM";
+        this.currentCurrency.ratio = this.allCurrencyRatios.MYR;
       }
-      else if(currency == "NZD"){
-        newRatio = this.allCurrencyRatios.NZD/this.currentCurrency.ratio;
-        this.currentCurrency.title="NZD";
-        this.currencyTitle="NZD";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "NZD $"){
+        this.currentCurrency.title="NZD $";
+        this.currentCurrency.ratio = this.allCurrencyRatios.NZD;
       }
-      else if(currency == "PHP"){
-        newRatio = this.allCurrencyRatios.PHP/this.currentCurrency.ratio;
-        this.currentCurrency.title="PHP";
-        this.currencyTitle="PHP";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "PHP ₱"){
+        this.currentCurrency.title="PHP ₱";
+        this.currentCurrency.ratio = this.allCurrencyRatios.PHP;
       }
-      else if(currency == "SGD"){
-        newRatio = this.allCurrencyRatios.SGD/this.currentCurrency.ratio;
-        this.currentCurrency.title="SGD";
-        this.currencyTitle="SGD";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "SGD $"){
+        this.currentCurrency.title="SGD $";
+        this.currentCurrency.ratio = this.allCurrencyRatios.SGD;
       }
-      else if(currency == "THB"){
-        newRatio = this.allCurrencyRatios.THB/this.currentCurrency.ratio;
-        this.currentCurrency.title="THB";
-        this.currencyTitle="THB";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+      else if(currency == "THB ฿"){
+        this.currentCurrency.title="THB ฿";
+        this.currentCurrency.ratio = this.allCurrencyRatios.THB;
       }
-    else if(currency == "ZAR"){
-        newRatio = this.allCurrencyRatios.ZAR/this.currentCurrency.ratio;
-        this.currentCurrency.title="ZAR";
-        this.currencyTitle="ZAR";
-        this.currentCurrency.ratio = newRatio;
-        this.finalExpenses = Math.round(this.finalExpenses * newRatio * 100) / 100;
+    else if(currency == "ZAR R"){
+        this.currentCurrency.title="ZAR R";
+        this.currentCurrency.ratio = this.allCurrencyRatios.ZAR;
       }
     }
   },
