@@ -17,10 +17,19 @@
           <v-card-title>{{ city.city_name }}</v-card-title>
           <v-card-subtitle>Finland</v-card-subtitle>
           <v-card-text>
-            <BarChart :cityId="city.id" />
+            <v-row>
+              <v-col cols="6">
+                <PieChart :cityId="city.id" />
+              </v-col>
+              <v-col cols="6">
+                <BarChart :cityId="city.id" />
+              </v-col>
+            </v-row>
           </v-card-text>
           <v-card-actions>
-            <v-btn @click="goToCityDetail(city.id)" color="primary"> View Details </v-btn>
+            <v-btn color="primary" @click="goToCityDetails(city.id)">
+              View Details
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -31,6 +40,7 @@
 <script>
 import VueApexCharts from "vue3-apexcharts";
 import BarChart from "@/components/BarChart.vue";
+import PieChart from "@/components/PieChart.vue";
 import axios from "axios";
 
 export default {
@@ -38,6 +48,7 @@ export default {
   components: {
     apexchart: VueApexCharts,
     BarChart,
+    PieChart,
   },
   data() {
     return {
@@ -48,8 +59,8 @@ export default {
     await this.fetchCities();
   },
   methods: {
-    goToCityDetail(id){
-      this.$router.push('/city-detail/'+id)
+    goToCityDetails(cityId) {
+      this.$router.push({ name: "CityDetail", params: { id: cityId } });
     },
     async fetchCities() {
       try {
