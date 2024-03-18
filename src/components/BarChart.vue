@@ -1,13 +1,8 @@
 <template>
   <v-container>
     <v-chart
-      v-if="
-        chartData &&
-        chartData.series &&
-        chartData.series[0] &&
-        chartData.series[0].data.length > 0
-      "
-      :option="echartOption"
+      v-if="barChartData && barChartData.series.length > 0"
+      :option="barChartOption"
       autoresize
       style="height: 300px"
     ></v-chart>
@@ -16,6 +11,7 @@
 
 <script>
 import axios from "axios";
+import 'echarts/lib/component/legend';
 
 export default {
   name: "BarChart",
@@ -27,70 +23,75 @@ export default {
   },
   data() {
     return {
-      chartData: {}, // Now we'll store ECharts options directly here
+      barChartData: {
+        categories: [],
+        series: [],
+      },
+      categoryColors: {
+        Utilities: "#5470C6",
+        Childcare: "#40E0D0",
+        Restaurants: "#EE6666",
+        Clothing: "#F9E79F",
+        Transportation: "#3BA272",
+        // Add more categories and colors as needed
+      },
     };
   },
   computed: {
-    echartOption() {
-      // This computed property will ensure reactivity
-      return this.chartData;
+    barChartOption() {
+      return {
+        tooltip: {
+          trigger: "axis",
+          axisPointer: { type: "shadow" },
+          formatter: function (params) {
+            const param = params[0];
+            return `${param.name}: €${param.value
+              .toFixed(2)
+              .replace(/\d(?=(\d{3})+\.)/g, "$&,")}`;
+          },
+        },
+        xAxis: {
+          type: "category",
+          data: this.barChartData.categories,
+        },
+        yAxis: {
+          type: "value",
+          axisLabel: {
+            formatter: "€{value}",
+          },
+        },
+        series: [
+          {
+            data: this.barChartData.series.map((value, index) => ({
+              value,
+              itemStyle: {
+                color:
+                  this.categoryColors[this.barChartData.categories[index]] ||
+                  "#999", // Fallback color
+              },
+            })),
+            type: "bar",
+          },
+        ],
+      };
     },
   },
   async created() {
-    await this.fetchCities();
+    await this.fetchChartData();
   },
   methods: {
-    async fetchCities() {
+    async fetchChartData() {
       try {
         const response = await axios.get(
-          `http://127.0.0.1:8080/api/v1/get-piechartdata/${this.cityId}`
+          `http://127.0.0.1:8080/api/v1/get-barchartdata/${this.cityId}`
         );
-        const dataForChart = response.data[0]; // Assuming the first item is what you need
-
-        // Setting up ECharts options
-        this.chartData = {
-          tooltip: {
-            trigger: "item",
-          },
-          legend: {
-            top: "5%",
-            left: "center",
-            show: true,
-          },
-          series: [
-            {
-              name: "Expenses From",
-              type: "pie",
-              radius: ["40%", "70%"],
-              avoidLabelOverlap: false,
-              itemStyle: {
-                borderRadius: 10,
-                borderColor: "#fff",
-                borderWidth: 2,
-              },
-              label: {
-                show: true,
-                position: "outside",
-                // formatter: params =>
-                //   `${params.data.name}: ${params.data.value}`,
-              },
-              emphasis: {
-                label: {
-                  show: true,
-                  fontSize: 30,
-                  fontWeight: "bold",
-                },
-              },
-              labelLine: {
-                show: true,
-              },
-              data: Object.entries(dataForChart).map(([name, value]) => ({
-                value,
-                name,
-              })),
-            },
-          ],
-        };
+        const data = response.data[0];
+        this.barChartData.categories = Object.keys(data).filter(
+          key => key !== "Summary"
+        );
+        this.barChartData.series = this.barChartData.categories.map(
+          key => data[key]
+        );
       } catch (error) {
         console.error("Error fetching city data:", error);
       }
