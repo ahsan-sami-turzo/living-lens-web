@@ -23,7 +23,17 @@ overflow: auto;
 .v-row{
   margin: 0 !important;
 }
-
+.v-list-item--variant-text .v-list-item__overlay {
+  background: transparent !important;
+}
+.v-list-item{
+  cursor:default;
+}
+.v-list-item.active, /* This targets the active state */
+  .v-list-item--active, /* This targets the active modifier */
+  .v-list-item--active .v-list-item__content { /* This targets the content within an active item */
+    background-color: transparent !important; /* Set the background color to transparent */
+  }
 </style>
 <template>
   <v-container>
@@ -31,7 +41,7 @@ overflow: auto;
       <v-col cols="12">
         <v-row style="justify-content: space-between;">
         <span style="font-size: 25px; font-weight: bold">
-          {{ this.cityName }}
+          {{ this.city.city_name }}
         </span>
         <v-btn style="width: auto !important" color="primary">{{currentCurrency.title}}
 
@@ -74,13 +84,13 @@ overflow: auto;
             <v-btn>
               {{ this.categories[index].name }}
 
-<v-menu activator="parent">
+<v-menu :close-on-content-click="false" activator="parent">
   <v-list style="max-height:300px;overflow:auto">
-    <v-list-item
-    v-for="subCategory in categories[this.categories[index].id - 1].sub"
+    <v-list-item :ripple="false"
+    v-for="(subCategory, index2) in categories[this.categories[index].id - 1].sub"
                   :key="subCategory.id"
                   
-            :value="index"
+            :value="index2"
     >
       <v-list-item-title>
         <div style="padding: 10px">
@@ -90,18 +100,18 @@ overflow: auto;
                           <v-col cols="1">
                             <input
                               type="checkbox"
-                              :checked="getCheckBoxValue(subCategory.id)"
+                              :checked="getCheckBoxValue(index,index2)"
                               v-bind:false-value="0"
                               v-bind:true-value="1"
                               @change="
                                 calculateExpenses(
                                   $event,
-                                  subCategory.average_price,
-                                  subCategory.id
+                                  index,
+                                  index2
                                 )
                               "
                           /></v-col>
-                          <v-col cols="11"
+                          <v-col style="white-space: nowrap ;overflow: hidden ;text-overflow: ellipsis" cols="11"
                             ><span>{{ subCategory.subcategory_name }}</span>
                           </v-col>
                         </div>
@@ -110,9 +120,13 @@ overflow: auto;
                         style="align-self: center; text-align: right"
                         cols="4"
                       >
-                        <span style="color: green"
+                      <v-row style="justify-content: space-evenly;">
+                        <v-text-field v-if="subCategory.checked==true" style="max-width: 100px;" type="number" v-model="subCategory.quantity" label="Quantity" @change="changeQuantityNumber(subCategory)"></v-text-field>
+                        <span style="color: green;align-self: center;"
                           >{{ (subCategory.average_price * currentCurrency.ratio).toFixed(2) }} {{ currentCurrency.title.split(" ")[1] }}</span
                         >
+                      </v-row>
+                        
                       </v-col>
                     </v-row>
                   </div>
@@ -140,13 +154,13 @@ overflow: auto;
             <v-btn v-if="index <= this.categories.length-2">
               {{ this.categories[index+1].name }}
 
-<v-menu activator="parent">
+<v-menu :close-on-content-click="false" activator="parent">
   <v-list style="max-height:300px;overflow:auto">
-    <v-list-item
-    v-for="subCategory in categories[this.categories[index+1].id - 1].sub"
+    <v-list-item :ripple="false"
+    v-for="(subCategory, index2) in categories[this.categories[index+1].id - 1].sub"
                   :key="subCategory.id"
                   
-            :value="index"
+            :value="index2"
     >
       <v-list-item-title>
         <div style="padding: 10px">
@@ -156,18 +170,18 @@ overflow: auto;
                           <v-col cols="1">
                             <input
                               type="checkbox"
-                              :checked="getCheckBoxValue(subCategory.id)"
+                              :checked="getCheckBoxValue(index+1,index2)"
                               v-bind:false-value="0"
                               v-bind:true-value="1"
                               @change="
                                 calculateExpenses(
                                   $event,
-                                  subCategory.average_price,
-                                  subCategory.id
+                                  index+1,
+                                  index2
                                 )
                               "
                           /></v-col>
-                          <v-col cols="11"
+                          <v-col style="white-space: nowrap ;overflow: hidden ;text-overflow: ellipsis" cols="11"
                             ><span>{{ subCategory.subcategory_name }}</span>
                           </v-col>
                         </div>
@@ -176,9 +190,12 @@ overflow: auto;
                         style="align-self: center; text-align: right"
                         cols="4"
                       >
-                        <span style="color: green"
+                      <v-row style="justify-content: space-evenly;">
+                        <v-text-field v-if="subCategory.checked==true" style="max-width: 100px;" type="number" v-model="subCategory.quantity" @change="changeQuantityNumber(subCategory)" label="Quantity"></v-text-field>
+                        <span style="color: green;align-self: center;"
                           >{{ (subCategory.average_price * currentCurrency.ratio).toFixed(2) }} {{ currentCurrency.title.split(" ")[1] }}</span
                         >
+                      </v-row>
                       </v-col>
                     </v-row>
                   </div>
@@ -261,6 +278,61 @@ overflow: auto;
             </v-row>
             </v-col>
           </v-row>
+          <v-row style="place-content: center;">
+          <span style="font-size: 30px;font-weight: bold;padding: 25px;"
+            >City Comparison</span
+          >
+        </v-row>
+        <v-row style="justify-content: center;
+    padding: 25px;">
+          <v-btn>
+              {{ compareToCountry.name }}
+          <v-menu activator="parent">
+  <v-list style="max-height:300px;overflow:auto">
+    <v-list-item
+      v-for="(country, index) in countries"
+      :key="index"
+      :value="index"
+    >
+      <v-list-item-title @click="changeCountry(country)">{{ country.name }}</v-list-item-title>
+    </v-list-item>
+  </v-list>
+</v-menu>
+          </v-btn>
+        </v-row>
+      <v-row style="justify-content: center;">
+          <v-btn>
+              {{ compareToCity.city_name }}
+<v-menu activator="parent">
+  <v-list style="max-height:300px;overflow:auto">
+    <v-list-item
+      v-for="(city, index) in cities"
+      :key="index"
+      :value="index"
+    >
+      <v-list-item-title @click="changeCity(city)">{{ city.city_name }}</v-list-item-title>
+    </v-list-item>
+  </v-list>
+</v-menu>
+          </v-btn>
+        </v-row>
+        <v-row v-if="city1Sum!=0" style="justify-content: center;padding-top: 25px;">
+            <span v-if="city1Sum > city2Sum" style="font-size: 18px;">
+              <span style="font-weight: bold;">{{ city.city_name }}</span> is <span style="color: red;font-weight: bold;">{{100 -  (city2Sum/city1Sum).toFixed(2) * 100}}%</span> more <span style="color: red;font-weight: bold;">expensive</span> than <span style="font-weight: bold;">{{ compareToCity.city_name }}</span>
+            </span>
+            <span v-else-if="city1Sum < city2Sum">
+              <span style="font-weight: bold;">{{ city.city_name }}</span> is <span style="color: green;font-weight: bold;">{{100 - (city1Sum/city2Sum).toFixed(2) * 100}}% cheaper</span> than <span style="font-weight: bold;">{{ compareToCity.city_name }}</span>
+            </span>
+            <span v-else-if="city1Sum < city2Sum">
+              <span style="font-weight: bold;">{{ city.city_name }}</span> and {{ compareToCity.city_name }} have the <span style="color: gray;">same</span> expenses
+            </span>
+          </v-row>
+          <v-row>
+            <div id="chart" style="width: 100%;">
+        <apexchart type="bar" height="430" :options="chartOptions" :series="series"></apexchart>
+      </div>
+          </v-row>
+          
       </v-col>
     </v-row>
   </v-container>
@@ -270,6 +342,7 @@ overflow: auto;
 import axios from "axios";
 import VueApexCharts from "vue3-apexcharts";
 import Freecurrencyapi from '@everapi/freecurrencyapi-js';
+import { cloneDeep } from 'lodash-es';
 
 export default {
   name: "CityDetail",
@@ -279,7 +352,52 @@ export default {
   data() {
     
     return {
-      a: 1,
+      series: [
+        {'data' : [],'name':''},
+        {'data' : [],'name' : ''} 
+      ],
+          chartOptions: {
+            chart: {
+              toolbar: {
+      show: false
+    },
+              type: 'bar',
+              height: 430
+            },
+            plotOptions: {
+              bar: {
+                horizontal: true,
+                dataLabels: {
+                  position: 'top',
+                },
+              }
+            },
+            dataLabels: {
+              enabled: true,
+              offsetX: -6,
+              style: {
+                fontSize: '12px',
+                colors: ['#fff']
+              }
+            },
+            labels:[],
+            stroke: {
+              show: true,
+              width: 1,
+              colors: ['#fff']
+            },
+            tooltip: {
+              shared: true,
+              intersect: false
+            },
+    },
+      countries : null,
+      cities: null,
+      city1Sum : 0,
+      city2Sum : 0,
+      comparisonText : '',
+      compareToCity : {'city_name':'Choose a City'},
+      compareToCountry : {'name':'Choose a Country'},
       allCurrencyRatios: {},
       currentCurrency: {
         "title": "EUR €",
@@ -288,15 +406,8 @@ export default {
       finalExpenses: 0,
       categories: null,
       animations: null,
-      subCategories: null,
-      checkedValues: {},
-      cityName:
-        this.$route.params.id == 7
-          ? "Helsinki"
-          : this.$route.params.id == 8
-          ? "Lappeenranta"
-          : "Lahti",
-      citiesFinalExpenses: [0, 0],
+      compareToCityCategories: null,
+      city: {},
       currencies:["EUR €", "USD $", "JPY ¥", "BGN лв", "CZK Kč", "DKK kr", "GBP £", "HUF Ft",
                 "PLN zł", "RON lei", "SEK kr", "CHF CHF", "ISK kr", "NOK kr", "RUB ₽", "TRY ₺",
                 "AUD $", "BRL R$","CAD $", "CNY ¥", "HKD $", "IDR Rp", "ILS ₪", "INR Rs", "KRW ₩",
@@ -304,30 +415,237 @@ export default {
     };
   },
   mounted(){
+    this.getCityById()
+    this.getCountries();
     this.getCategories();
     this.getAllCurrencyRatio()
   },
   methods: {
+    changeQuantityNumber(sub){
+      if(sub.quantity>=5000){
+        sub.quantity=5000
+      }
+      else if(sub.quantity<=1){
+        sub.quantity=1
+      }
+      if(sub.previousQuantity < sub.quantity){
+        this.finalExpenses += sub.average_price * this.currentCurrency.ratio
+      }
+      else if(sub.previousQuantity > sub.quantity){
+        this.finalExpenses -= sub.average_price * this.currentCurrency.ratio 
+      }
+      sub.previousQuantity = sub.quantity; 
+      if(this.compareToCity.city_name!='Choose a City'){
+      this.getChartSubcategories()
+      }
+    },
+    async getCityById(){
+      var data = 
+        await axios.get("http://localhost:8080/api/v1/get-city-by-id/"+this.$route.params.id);
+        this.city = data.data
+      
+    },
     
-    getCheckBoxValue(id) {
-      return this.checkedValues[id] != null && this.checkedValues[id] == true
+    getChartSubcategories(){
+      this.city1Sum = 0;
+      this.city2Sum = 0;
+      this.series[0].data = []
+      this.series[0].name = this.city.city_name
+      this.series[1].data = []
+      this.series[1].name = this.compareToCity.city_name
+      var res = []
+      this.chartOptions= {
+            chart: {
+              toolbar: {
+      show: false
+    },
+              type: 'bar',
+              height: 430
+            },
+            plotOptions: {
+              bar: {
+                horizontal: true,
+                dataLabels: {
+                  position: 'top',
+                },
+              }
+            },
+            dataLabels: {
+              enabled: true,
+              offsetX: -6,
+              style: {
+                fontSize: '12px',
+                colors: ['#fff']
+              }
+            },
+            labels:[],
+            stroke: {
+              show: true,
+              width: 1,
+              colors: ['#fff']
+            },
+            tooltip: {
+              shared: true,
+              intersect: false
+            },
+    };
+      for(let i = 0; i < this.categories.length; i+=1){
+        for (let j = 0; j < this.categories[i].sub.length; j+=1){
+          if(this.categories[i].sub[j].checked){
+            this.series[1].data.push((this.compareToCityCategories[i].sub[j].average_price * this.categories[i].sub[j].quantity * this.currentCurrency.ratio / 1).toFixed(2))
+            this.series[0].data.push((this.categories[i].sub[j].average_price * this.categories[i].sub[j].quantity * this.currentCurrency.ratio / 1).toFixed(2))
+            res.push(this.categories[i].sub[j].subcategory_name)
+          }
+        }
+      }
+      this.chartOptions= {
+            chart: {
+              toolbar: {
+      show: false
+    },
+              type: 'bar',
+              height: 430
+            },
+            plotOptions: {
+              bar: {
+                horizontal: true,
+                dataLabels: {
+                  position: 'top',
+                },
+              }
+            },
+            dataLabels: {
+              enabled: true,
+              offsetX: -6,
+              style: {
+                fontSize: '12px',
+                colors: ['#fff']
+              }
+            },
+            labels:res,
+            stroke: {
+              show: true,
+              width: 1,
+              colors: ['#fff']
+            },
+            tooltip: {
+              shared: true,
+              intersect: false
+            },
+    };
+    
+    for (let item of this.series[0].data){
+      this.city1Sum+=parseFloat(item);
+    }
+    for (let item of this.series[1].data){
+      this.city2Sum+=parseFloat(item);
+    }
+    
+    },
+    changeCity(city){
+      this.compareToCity = city;
+      this.getCompareToCityData(city)
+    },
+    changeCountry(country){
+      this.city1Sum = 0;
+      this.city2Sum = 0;
+      this.compareToCountry = country
+      this.compareToCity.city_name = 'Choose a City'
+      this.series= [
+        {'data' : [],'name':''},
+        {'data' : [],'name' : ''} 
+      ];
+      this.chartOptions= {
+            chart: {
+              toolbar: {
+      show: false
+    },
+              type: 'bar',
+              height: 430
+            },
+            plotOptions: {
+              bar: {
+                horizontal: true,
+                dataLabels: {
+                  position: 'top',
+                },
+              }
+            },
+            dataLabels: {
+              enabled: true,
+              offsetX: -6,
+              style: {
+                fontSize: '12px',
+                colors: ['#fff']
+              }
+            },
+            labels:[],
+            stroke: {
+              show: true,
+              width: 1,
+              colors: ['#fff']
+            },
+            tooltip: {
+              shared: true,
+              intersect: false
+            },
+    };
+      this.getCities(country)
+    },
+
+    async getCities(country){
+        var data = 
+        await axios.get("http://localhost:8080/api/v1/get-cities/"+country.id);
+        this.cities = data.data
+    },
+
+    async getCountries(){
+      var data=
+        await axios.get("http://localhost:8080/api/v1/get-countries/");
+        this.countries = data.data
+        
+    },
+
+    getCheckBoxValue(categoryIndex,subCategoryIndex) {
+      return this.categories[this.categories[categoryIndex].id - 1].sub[subCategoryIndex].checked != null && this.categories[this.categories[categoryIndex].id - 1].sub[subCategoryIndex].checked == true
         ? true
         : false;
     },
 
-    calculateExpenses(value, price, subCategoryId) {
+    async getCompareToCityData(city){
+      var compareToCitySubCategories = null;
+      for (let category of this.compareToCityCategories){
+        compareToCitySubCategories = (
+          await axios.get(
+            "http://localhost:8080/api/v1/get-subcategories-by-city-and-category/" +
+              city.id +
+              "/" +
+              category.id
+          )
+        ).data;
+        this.compareToCityCategories[category.id - 1]["sub"] = compareToCitySubCategories;
+    }
+      this.getChartSubcategories()
+          
+    },
+
+    calculateExpenses(value, categoryIndex,subCategoryIndex) {
       if (value.target.checked) {
-        this.finalExpenses += price;
-        this.checkedValues[subCategoryId] = true;
+        this.finalExpenses += this.categories[categoryIndex].sub[subCategoryIndex].average_price * this.categories[categoryIndex].sub[subCategoryIndex].quantity;
+        this.categories[categoryIndex].sub[subCategoryIndex].checked= true;
       } else {
-        this.finalExpenses -= price;
-        this.checkedValues[subCategoryId] = false;
+        this.finalExpenses -= this.categories[categoryIndex].sub[subCategoryIndex].average_price * this.categories[categoryIndex].sub[subCategoryIndex].quantity;
+        this.categories[categoryIndex].sub[subCategoryIndex].checked= false;
+      }
+      if(this.compareToCity.city_name!='Choose a City'){
+      this.getChartSubcategories()
       }
     },
     async getCategories() {
-      this.categories =
+      var data =
         await axios.get("http://localhost:8080/api/v1/get-categories/");
-      this.categories = this.categories.data;
+      this.categories = data.data;
+      this.compareToCityCategories = cloneDeep(this.categories);
       this.categories.splice(9, 1);
       this.animations = [
         "https://lottie.host/b2609a02-bcb1-4621-bdbf-4ca667b01d5f/qKaKzOePbQ.json",
@@ -343,9 +661,10 @@ export default {
       this.getSubcategories();
     },
     async getSubcategories() {
+      var subCategories = null;
       for (let category of this.categories){
       if (this.categories[category.id - 1]["sub"] == null) {
-        this.subCategories = (
+        subCategories = (
           await axios.get(
             "http://localhost:8080/api/v1/get-subcategories-by-city-and-category/" +
               this.$route.params.id +
@@ -353,7 +672,12 @@ export default {
               category.id
           )
         ).data;
-        this.categories[category.id - 1]["sub"] = this.subCategories;
+        this.categories[category.id - 1]["sub"] = subCategories;
+        for (let i = 0 ; i < this.categories[category.id - 1]["sub"].length;i+=1){
+        this.categories[category.id - 1]["sub"][i]["checked"] = false
+        this.categories[category.id - 1]["sub"][i]["quantity"] = 1
+        this.categories[category.id - 1]["sub"][i]["previousQuantity"] = 1
+      }
       } else {
         this.categories[category.id - 1]["sub"] = null;
       }
@@ -367,7 +691,6 @@ export default {
         currencies: ""
     }).then(res => {
       this.allCurrencyRatios = res.data;
-      console.log(this.allCurrencyRatios.USD);
     });
     
     },
@@ -499,6 +822,9 @@ export default {
     else if(currency == "ZAR R"){
         this.currentCurrency.title="ZAR R";
         this.currentCurrency.ratio = this.allCurrencyRatios.ZAR;
+      }
+      if(this.compareToCity.city_name!='Choose a City'){
+      this.getChartSubcategories()
       }
     }
   },
