@@ -69,9 +69,9 @@ overflow: auto;
         >
         <div v-if="index%2==0">
           <v-row>
-        <v-col cols="6">
-          <v-col style="height: 100%;">
-          <Vue3Lottie
+        <v-col cols="6" style="width: 550px;">
+          <v-col style="height: 100%;text-align: -webkit-center;margin-bottom: 55px;">
+          <!-- <Vue3Lottie
               ref="customControl"
               
               :animationLink="animations[index]"
@@ -80,7 +80,8 @@ overflow: auto;
               :autoPlay="true"
               :pauseAnimation="true"
               :pauseOnHover="true"
-            />
+            /> -->
+            <img width="170" height="170" :src="getImage(index)">
             <v-btn>
               {{ this.categories[index].name }}
 
@@ -95,7 +96,7 @@ overflow: auto;
       <v-list-item-title>
         <div style="padding: 10px">
                     <v-row>
-                      <v-col cols="8">
+                      <v-col cols="6">
                         <div class="d-flex">
                           <v-col cols="1">
                             <input
@@ -104,7 +105,7 @@ overflow: auto;
                               v-bind:false-value="0"
                               v-bind:true-value="1"
                               @change="
-                                calculateExpenses(
+                                addSubItemToExpenses(
                                   $event,
                                   index,
                                   index2
@@ -118,10 +119,24 @@ overflow: auto;
                       </v-col>
                       <v-col
                         style="align-self: center; text-align: right"
-                        cols="4"
+                        cols="6"
                       >
                       <v-row style="justify-content: space-evenly;">
-                        <v-text-field v-if="subCategory.checked==true" style="max-width: 100px;" type="number" v-model="subCategory.quantity" label="Quantity" @change="changeQuantityNumber(subCategory)"></v-text-field>
+                        <v-btn style="align-self: center;width: 80px;font-size: 12px;" v-if="subCategory.checked==true">
+              {{ subCategory.duration }}
+<v-menu  :close-on-content-click="false" activator="parent">
+  <v-list style="max-height:300px;overflow:auto">
+    <v-list-item
+      v-for="(item, index3) in durations"
+      :key="index3"
+      :value="index3"
+    >
+      <v-list-item-title @click="changeDuration(item,index+1,index2)">{{ item }}</v-list-item-title>
+    </v-list-item>
+  </v-list>
+</v-menu>
+          </v-btn>
+                        <v-text-field v-if="subCategory.checked==true" style="max-width: 80px;" type="number" v-model="subCategory.quantity" label="Quantity" @change="changeQuantityNumber(subCategory)"></v-text-field>
                         <span style="color: green;align-self: center;"
                           >{{ (subCategory.average_price * currentCurrency.ratio).toFixed(2) }} {{ currentCurrency.title.split(" ")[1] }}</span
                         >
@@ -139,9 +154,9 @@ overflow: auto;
         </v-col>
       </v-col>
 
-        <v-col cols="6">
-          <v-col style="height: 100%;">
-          <Vue3Lottie v-if="index  <= this.categories.length-2"
+        <v-col cols="6" style="width: 550px;">
+          <v-col style="height: 100%;text-align: -webkit-center;">
+          <!-- <Vue3Lottie v-if="index  <= this.categories.length-2"
               ref="customControl"
               
               :animationLink="animations[index + 1]"
@@ -150,7 +165,8 @@ overflow: auto;
               :autoPlay="true"
               :pauseAnimation="true"
               :pauseOnHover="true"
-            />
+            /> -->
+            <img v-if="index  <= this.categories.length-2" width="170" height="170" :src="getImage(index+1)">
             <v-btn v-if="index <= this.categories.length-2">
               {{ this.categories[index+1].name }}
 
@@ -165,7 +181,7 @@ overflow: auto;
       <v-list-item-title>
         <div style="padding: 10px">
                     <v-row>
-                      <v-col cols="8">
+                      <v-col cols="6">
                         <div class="d-flex">
                           <v-col cols="1">
                             <input
@@ -174,7 +190,7 @@ overflow: auto;
                               v-bind:false-value="0"
                               v-bind:true-value="1"
                               @change="
-                                calculateExpenses(
+                                addSubItemToExpenses(
                                   $event,
                                   index+1,
                                   index2
@@ -188,10 +204,24 @@ overflow: auto;
                       </v-col>
                       <v-col
                         style="align-self: center; text-align: right"
-                        cols="4"
+                        cols="6"
                       >
                       <v-row style="justify-content: space-evenly;">
-                        <v-text-field v-if="subCategory.checked==true" style="max-width: 100px;" type="number" v-model="subCategory.quantity" @change="changeQuantityNumber(subCategory)" label="Quantity"></v-text-field>
+                        <v-btn style="align-self: center;width: 80px;font-size: 12px;" v-if="subCategory.checked==true">
+              {{ subCategory.duration }}
+<v-menu  :close-on-content-click="false" activator="parent">
+  <v-list style="max-height:300px;overflow:auto">
+    <v-list-item
+      v-for="(item, index3) in durations"
+      :key="index3"
+      :value="index3"
+    >
+      <v-list-item-title @click="changeDuration(item,index+1,index2)">{{ item }}</v-list-item-title>
+    </v-list-item>
+  </v-list>
+</v-menu>
+          </v-btn>
+                        <v-text-field v-if="subCategory.checked==true" style="max-width: 80px;" type="number" v-model="subCategory.quantity" @change="changeQuantityNumber(subCategory)" label="Quantity"></v-text-field>
                         <span style="color: green;align-self: center;"
                           >{{ (subCategory.average_price * currentCurrency.ratio).toFixed(2) }} {{ currentCurrency.title.split(" ")[1] }}</span
                         >
@@ -227,7 +257,7 @@ overflow: auto;
               <div style="width:100%;display: flex;align-items: center;
     justify-content: center;;background-color: #004e00;border-radius: 5px;color: white;height: 40px;">
                 <span style="font-weight: bold;">
-                  {{ (finalExpenses * 12 * currentCurrency.ratio).toFixed(2)  }}
+                  {{ (yearlyExpenses * currentCurrency.ratio / 1).toFixed(2)  }}
                 </span>
               </div>
             </v-row>
@@ -242,7 +272,7 @@ overflow: auto;
               <div style="width:100%;display: flex;align-items: center;
     justify-content: center;;background-color: #004e00;border-radius: 5px;color: white;height: 40px;">
                 <span style="font-weight: bold;">
-                  {{ (finalExpenses * currentCurrency.ratio / 1).toFixed(2)  }}
+                  {{ (monthlyExpenses * currentCurrency.ratio / 1).toFixed(2)  }}
                 </span>
               </div>
             </v-row>
@@ -257,7 +287,7 @@ overflow: auto;
               <div style="width:100%;display: flex;align-items: center;
     justify-content: center;;background-color: #004e00;border-radius: 5px;color: white;height: 40px;">
                 <span style="font-weight: bold;">
-                  {{ (finalExpenses * currentCurrency.ratio / 4).toFixed(2) }}
+                  {{ (weeklyExpenses * currentCurrency.ratio / 1).toFixed(2) }}
                 </span>
               </div>
             </v-row>
@@ -272,7 +302,7 @@ overflow: auto;
               <div style="width:100%;display: flex;align-items: center;
     justify-content: center;;background-color: #004e00;border-radius: 5px;color: white;height: 40px;">
                 <span style="font-weight: bold;">
-                  {{ (finalExpenses * currentCurrency.ratio / 30).toFixed(2) }}
+                  {{ (dailyExpenses * currentCurrency.ratio / 1).toFixed(2) }}
                 </span>
               </div>
             </v-row>
@@ -283,8 +313,7 @@ overflow: auto;
             >City Comparison</span
           >
         </v-row>
-        <v-row style="justify-content: center;
-    padding: 25px;">
+        <v-row style="justify-content: center;padding: 25px;">
           <v-btn>
               {{ compareToCountry.name }}
           <v-menu activator="parent">
@@ -315,6 +344,7 @@ overflow: auto;
   </v-list>
 </v-menu>
           </v-btn>
+          
         </v-row>
         <v-row v-if="city1Sum!=0" style="justify-content: center;padding-top: 25px;">
             <span v-if="city1Sum > city2Sum" style="font-size: 18px;">
@@ -352,6 +382,11 @@ export default {
   data() {
     
     return {
+      dailyExpenses : 0,
+      weeklyExpenses : 0,
+      monthlyExpenses : 0,
+      yearlyExpenses : 0,
+      durations:['Daily','Weekly','Monthly','Yearly'],
       series: [
         {'data' : [],'name':''},
         {'data' : [],'name' : ''} 
@@ -403,9 +438,18 @@ export default {
         "title": "EUR €",
         "ratio": 1,
       },
-      finalExpenses: 0,
       categories: null,
-      animations: null,
+      icons: [
+      "../assets/restaurant.png",
+        "../assets/grocery.png",
+        "../assets/transportation.png",
+        "../assets/home.png",
+        "../assets/sports.png",
+        "../assets/boy.png",
+        "../assets/shopping.png",
+        "../assets/home (1).png",
+        "../assets/flats.png",
+      ],
       compareToCityCategories: null,
       city: {},
       currencies:["EUR €", "USD $", "JPY ¥", "BGN лв", "CZK Kč", "DKK kr", "GBP £", "HUF Ft",
@@ -421,6 +465,68 @@ export default {
     this.getAllCurrencyRatio()
   },
   methods: {
+    changeDuration(item,categoryIndex,subCategoryIndex){
+      this.calculateExpenses(this.categories[categoryIndex].sub[subCategoryIndex],'substract',this.categories[categoryIndex].sub[subCategoryIndex].quantity)
+      this.categories[categoryIndex].sub[subCategoryIndex].duration= item;
+      this.calculateExpenses(this.categories[categoryIndex].sub[subCategoryIndex],'add',this.categories[categoryIndex].sub[subCategoryIndex].quantity)
+    },
+    getImage(index){
+      return new URL(this.icons[index], import.meta.url).href;
+    },
+    calculateExpenses(sub,operation,quantity){
+      if(operation == 'add'){
+        if(sub.duration == 'Daily'){
+        this.dailyExpenses += sub.average_price * this.currentCurrency.ratio * quantity
+        this.weeklyExpenses += sub.average_price * this.currentCurrency.ratio * quantity * 7
+        this.monthlyExpenses += sub.average_price * this.currentCurrency.ratio * quantity * 30
+        this.yearlyExpenses += sub.average_price * this.currentCurrency.ratio * quantity * 365
+        }
+        else if(sub.duration == 'Weekly'){
+        this.weeklyExpenses += sub.average_price * this.currentCurrency.ratio * quantity
+        this.dailyExpenses += sub.average_price * this.currentCurrency.ratio * quantity / 7
+        this.monthlyExpenses += sub.average_price * this.currentCurrency.ratio * quantity * 4
+        this.yearlyExpenses += sub.average_price * this.currentCurrency.ratio * quantity * 48
+        }
+        else if(sub.duration == 'Monthly'){
+        this.monthlyExpenses += sub.average_price * this.currentCurrency.ratio * quantity
+        this.weeklyExpenses += sub.average_price * this.currentCurrency.ratio * quantity / 4
+        this.dailyExpenses += sub.average_price * this.currentCurrency.ratio * quantity / 30
+        this.yearlyExpenses += sub.average_price * this.currentCurrency.ratio * quantity * 12
+        }
+        else if(sub.duration == 'Yearly'){
+        this.yearlyExpenses += sub.average_price * this.currentCurrency.ratio * quantity
+        this.monthlyExpenses += sub.average_price * this.currentCurrency.ratio * quantity / 12
+        this.weeklyExpenses += sub.average_price * this.currentCurrency.ratio * quantity / 48
+        this.dailyExpenses += sub.average_price * this.currentCurrency.ratio * quantity / 365
+        }
+      }
+      else if(operation == 'substract'){
+        if(sub.duration == 'Daily'){
+        this.dailyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity
+        this.weeklyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity * 7
+        this.monthlyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity * 30
+        this.yearlyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity * 365
+        }
+        else if(sub.duration == 'Weekly'){
+        this.weeklyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity
+        this.dailyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity / 7
+        this.monthlyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity * 4
+        this.yearlyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity * 48
+        }
+        else if(sub.duration == 'Monthly'){
+        this.monthlyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity
+        this.weeklyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity / 4
+        this.dailyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity / 30
+        this.yearlyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity * 12
+        }
+        else if(sub.duration == 'Yearly'){
+        this.yearlyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity
+        this.monthlyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity / 12
+        this.weeklyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity / 48
+        this.dailyExpenses -= sub.average_price * this.currentCurrency.ratio * quantity / 365
+        }
+      }
+    },
     changeQuantityNumber(sub){
       if(sub.quantity>=5000){
         sub.quantity=5000
@@ -429,10 +535,10 @@ export default {
         sub.quantity=1
       }
       if(sub.previousQuantity < sub.quantity){
-        this.finalExpenses += sub.average_price * this.currentCurrency.ratio
+        this.calculateExpenses(sub,'add',1)
       }
       else if(sub.previousQuantity > sub.quantity){
-        this.finalExpenses -= sub.average_price * this.currentCurrency.ratio 
+        this.calculateExpenses(sub,'substract',1)
       }
       sub.previousQuantity = sub.quantity; 
       if(this.compareToCity.city_name!='Choose a City'){
@@ -492,8 +598,10 @@ export default {
       for(let i = 0; i < this.categories.length; i+=1){
         for (let j = 0; j < this.categories[i].sub.length; j+=1){
           if(this.categories[i].sub[j].checked){
-            this.series[1].data.push((this.compareToCityCategories[i].sub[j].average_price * this.categories[i].sub[j].quantity * this.currentCurrency.ratio / 1).toFixed(2))
-            this.series[0].data.push((this.categories[i].sub[j].average_price * this.categories[i].sub[j].quantity * this.currentCurrency.ratio / 1).toFixed(2))
+              this.series[1].data.push((this.compareToCityCategories[i].sub[j].average_price * this.categories[i].sub[j].quantity * this.currentCurrency.ratio / 1).toFixed(2))
+              this.series[0].data.push((this.categories[i].sub[j].average_price * this.categories[i].sub[j].quantity * this.currentCurrency.ratio / 1).toFixed(2))
+            
+            
             res.push(this.categories[i].sub[j].subcategory_name)
           }
         }
@@ -629,12 +737,12 @@ export default {
           
     },
 
-    calculateExpenses(value, categoryIndex,subCategoryIndex) {
+    addSubItemToExpenses(value, categoryIndex,subCategoryIndex) {
       if (value.target.checked) {
-        this.finalExpenses += this.categories[categoryIndex].sub[subCategoryIndex].average_price * this.categories[categoryIndex].sub[subCategoryIndex].quantity;
+        this.calculateExpenses(this.categories[categoryIndex].sub[subCategoryIndex],'add',this.categories[categoryIndex].sub[subCategoryIndex].quantity)
         this.categories[categoryIndex].sub[subCategoryIndex].checked= true;
       } else {
-        this.finalExpenses -= this.categories[categoryIndex].sub[subCategoryIndex].average_price * this.categories[categoryIndex].sub[subCategoryIndex].quantity;
+        this.calculateExpenses(this.categories[categoryIndex].sub[subCategoryIndex],'substract',this.categories[categoryIndex].sub[subCategoryIndex].quantity)
         this.categories[categoryIndex].sub[subCategoryIndex].checked= false;
       }
       if(this.compareToCity.city_name!='Choose a City'){
@@ -647,17 +755,6 @@ export default {
       this.categories = data.data;
       this.compareToCityCategories = cloneDeep(this.categories);
       this.categories.splice(9, 1);
-      this.animations = [
-        "https://lottie.host/b2609a02-bcb1-4621-bdbf-4ca667b01d5f/qKaKzOePbQ.json",
-        "https://lottie.host/05e6e52f-20eb-4f3f-b3ac-43f8edf9c3fc/18eMtCBHxy.json",
-        "https://lottie.host/a5c0ebb7-349a-4e7e-9d45-77f30f9254c3/Xvz878J0U1.json",
-        "https://lottie.host/38ca4d1b-e444-45be-a086-946e778eae7e/kuR6OQrPpk.json",
-        "https://lottie.host/9e50963c-153a-4788-80f0-154266985dbb/k39vURwzdP.json",
-        "https://lottie.host/ee87fbe4-e819-4d8a-ada4-dda3f9034b18/aBob0xGvYS.json",
-        "https://lottie.host/d0d28912-9cce-4324-b700-eca75022367b/dawUrq0rvU.json",
-        "https://lottie.host/be3607c6-3076-4636-89f7-c1e989357057/Z6MNDuXfeK.json",
-        "https://lottie.host/d1e69b6d-e09d-42c9-95e6-990d06b006ee/JyDcnADyUH.json",
-      ];
       this.getSubcategories();
     },
     async getSubcategories() {
@@ -677,6 +774,7 @@ export default {
         this.categories[category.id - 1]["sub"][i]["checked"] = false
         this.categories[category.id - 1]["sub"][i]["quantity"] = 1
         this.categories[category.id - 1]["sub"][i]["previousQuantity"] = 1
+        this.categories[category.id - 1]["sub"][i]["duration"] = "Monthly";
       }
       } else {
         this.categories[category.id - 1]["sub"] = null;
@@ -687,7 +785,7 @@ export default {
     getAllCurrencyRatio(){
       const freecurrencyapi = new Freecurrencyapi('fca_live_9ztRlxjMVYB7PnVHzHDHDUSbVe0krUGZFNtj2QiQ');
       freecurrencyapi.latest({
-        base_currency: 'EUR',
+        duration_currency: 'EUR',
         currencies: ""
     }).then(res => {
       this.allCurrencyRatios = res.data;
