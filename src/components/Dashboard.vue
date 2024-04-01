@@ -65,7 +65,7 @@ export default {
     async fetchCities() {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8080/api/v1/get-cities/3"
+          "https://api.ll.beydu.com/api/v1/get-cities/3"
         );
 
         response.data.map(city => {

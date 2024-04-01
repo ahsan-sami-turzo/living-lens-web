@@ -83,7 +83,7 @@ export default {
     async fetchChartData() {
       try {
         const response = await axios.get(
-          `http://127.0.0.1:8080/api/v1/get-barchartdata/${this.cityId}`
+          `https://api.ll.beydu.com/api/v1/get-barchartdata/${this.cityId}`
         );
         const data = response.data[0];
         this.barChartData.categories = Object.keys(data).filter(

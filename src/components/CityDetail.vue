@@ -440,15 +440,15 @@ export default {
       },
       categories: null,
       icons: [
-      "../assets/restaurant.png",
-        "../assets/grocery.png",
-        "../assets/transportation.png",
-        "../assets/home.png",
-        "../assets/sports.png",
-        "../assets/boy.png",
-        "../assets/shopping.png",
-        "../assets/home (1).png",
-        "../assets/flats.png",
+      "/restaurant.png",
+        "/grocery.png",
+        "/transportation.png",
+        "/home.png",
+        "/sports.png",
+        "/boy.png",
+        "/shopping.png",
+        "/home (1).png",
+        "/flats.png",
       ],
       compareToCityCategories: null,
       city: {},
@@ -547,7 +547,7 @@ export default {
     },
     async getCityById(){
       var data = 
-        await axios.get("http://localhost:8080/api/v1/get-city-by-id/"+this.$route.params.id);
+        await axios.get("https://api.ll.beydu.com/api/v1/get-city-by-id/"+this.$route.params.id);
         this.city = data.data
       
     },
@@ -703,13 +703,13 @@ export default {
 
     async getCities(country){
         var data = 
-        await axios.get("http://localhost:8080/api/v1/get-cities/"+country.id);
+        await axios.get("https://api.ll.beydu.com/api/v1/get-cities/"+country.id);
         this.cities = data.data
     },
 
     async getCountries(){
       var data=
-        await axios.get("http://localhost:8080/api/v1/get-countries/");
+        await axios.get("https://api.ll.beydu.com/api/v1/get-countries/");
         this.countries = data.data
         
     },
@@ -725,7 +725,7 @@ export default {
       for (let category of this.compareToCityCategories){
         compareToCitySubCategories = (
           await axios.get(
-            "http://localhost:8080/api/v1/get-subcategories-by-city-and-category/" +
+            "https://api.ll.beydu.com/api/v1/get-subcategories-by-city-and-category/" +
               city.id +
               "/" +
               category.id
@@ -751,7 +751,7 @@ export default {
     },
     async getCategories() {
       var data =
-        await axios.get("http://localhost:8080/api/v1/get-categories/");
+        await axios.get("https://api.ll.beydu.com/api/v1/get-categories/");
       this.categories = data.data;
       this.compareToCityCategories = cloneDeep(this.categories);
       this.categories.splice(9, 1);
@@ -763,7 +763,7 @@ export default {
       if (this.categories[category.id - 1]["sub"] == null) {
         subCategories = (
           await axios.get(
-            "http://localhost:8080/api/v1/get-subcategories-by-city-and-category/" +
+            "https://api.ll.beydu.com/api/v1/get-subcategories-by-city-and-category/" +
               this.$route.params.id +
               "/" +
               category.id

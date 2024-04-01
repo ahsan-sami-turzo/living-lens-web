@@ -51,7 +51,7 @@ export default {
     async fetchChartData() {
       try {
         const response = await axios.get(
-          `http://127.0.0.1:8080/api/v1/get-piechartdata/${this.cityId}`
+          `https://api.ll.beydu.com/api/v1/get-piechartdata/${this.cityId}`
         );
         const dataForChart = response.data[0]; // Assuming the first item is what you need
 
