@@ -15,7 +15,7 @@ const routes = [
     component: Admin,
   },
   {
-    path: "/city-detail/:id",
+    path: "/city-detail/:id/:city_name",
     name: "CityDetail",
     component: CityDetail,
   },
