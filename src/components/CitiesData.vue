@@ -37,12 +37,12 @@ export default {
     async fetchCities() {
       try {
         const response = await axios.get(
-          "http://127.0.0.1:8080/api/v1/get-cities/3"
+          "https://api.ll.beydu.com/api/v1/get-cities/3"
         );
         await Promise.all(
           response.data.map(async city => {
             const cityDataResponse = await axios.get(
-              `http://127.0.0.1:8080/api/v1/get-piechartdata/${city.id}`
+              `https://api.ll.beydu.com/api/v1/get-piechartdata/${city.id}`
             );
             const dataForChart = cityDataResponse.data[0]; // Assuming each city has one data object
             this.cities.push({

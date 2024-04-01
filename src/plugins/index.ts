@@ -33,7 +33,6 @@ use([
 ]);
 
 import Vue3Lottie from "vue3-lottie";
-
 // Types
 import type { App } from "vue";
 
