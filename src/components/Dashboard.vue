@@ -2,14 +2,14 @@
   <v-container>
     <v-row>
       <v-col cols="4">
-        <v-combobox
+        <v-select
           clearable
-          chips
           label="Select Country"
-          :items="['Finland', 'Germany', 'Italy']"
-          variant="outlined"
-          @change="updateList"
-        ></v-combobox>
+          v-model="selectedCountry"
+          :items="countries"
+          return-object
+          @input="countrySelected"
+        ></v-select>
       </v-col>
     </v-row>
     <v-row cols="6" v-for="city in cities" :key="city.id">
@@ -28,7 +28,7 @@
             </v-row>
           </v-card-text>
           <v-card-actions>
-            <v-btn color="primary" @click="goToCityDetails(city.id)">
+            <v-btn color="primary" @click="goToCityDetails(city)">
               View Details
             </v-btn>
           </v-card-actions>
@@ -55,30 +55,51 @@ export default {
     return {
       selectedCity: null,
       cities: [],
+      countries: [],
+      selectedCountry: null,
     };
   },
   async created() {
-    this.selectedCity = "Finland";
-    await this.fetchCities();
+    // this.selectedCity = "Finland";
+    await this.fetchCountries();
   },
   methods: {
-    updateList() {
-      console.log("CITY: ", this.selectedCity);
+    goToCityDetails(city) {
+      this.$router.push({
+        name: "CityDetail",
+        params: { id: city.id, city_name: city.city_name },
+      });
     },
-    goToCityDetails(cityId) {
-      this.$router.push({ name: "CityDetail", params: { id: cityId } });
+    countrySelected() {
+      console.log("selected: ", this.selectedCountry);
+      if (this.selectedCountry) {
+        console.log("selected: ", this.selectedCountry);
+        this.fetchCities(this.selectedCountry.value);
+      } else {
+        console.log("empty: ", this.selectedCountry);
+        this.cities = [];
+      }
     },
-    async fetchCities() {
+    async fetchCities(countryId) {
       try {
         const response = await axios.get(
-          "https://api.ll.beydu.com/api/v1/get-cities/3"
+          `https://api.ll.beydu.com/api/v1/get-cities/${countryId}`
         );
-
-        response.data.map(city => {
-          this.cities.push({ ...city });
-        });
+        this.cities = response.data;
       } catch (error) {
-        console.error("Error fetching cities or city data:", error);
+        console.error("Error fetching cities:", error);
+      }
+    },
+    async fetchCountries() {
+      try {
+        const response = await axios.get(
+          "https://api.ll.beydu.com/api/v1/get-countries/"
+        );
+        response.data.map(data =>
+          this.countries.push({ title: data.name, value: data.id })
+        );
+      } catch (error) {
+        console.error("Error fetching countries:", error);
       }
     },
   },
