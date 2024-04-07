@@ -29,7 +29,7 @@
           <v-card-subtitle>{{selectedCountry.title}}</v-card-subtitle>
           <v-card-text>
             <v-row>
-              <v-col cols="6">
+              <v-col style="place-content: center;" cols="6">
                 <PieChart :cityId="city.id" />
               </v-col>
               <v-col cols="6">
