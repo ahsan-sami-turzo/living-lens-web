@@ -26,7 +26,7 @@
       <v-col>
         <v-card>
           <v-card-title>{{ city.city_name }}</v-card-title>
-          <v-card-subtitle>{{selectedCountry}}</v-card-subtitle>
+          <v-card-subtitle>{{selectedCountry.title}}</v-card-subtitle>
           <v-card-text>
             <v-row>
               <v-col cols="6">
