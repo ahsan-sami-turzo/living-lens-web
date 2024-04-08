@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: living-lens-ui
-          image: xuminnek/livinglens:livinglens-ui-003
+          image: <IMAGE>
               
              
 ---
