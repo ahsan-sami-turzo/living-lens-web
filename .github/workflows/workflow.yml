@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout dev branch
-        uses: actions/checkout@dev
+        uses: actions/checkout@v4
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
