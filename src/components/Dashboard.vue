@@ -39,7 +39,7 @@
           </v-card-text>
           <v-card-actions>
             <v-btn color="primary" @click="goToCityDetails(city)">
-              View Details
+              View City Details
             </v-btn>
           </v-card-actions>
         </v-card>
