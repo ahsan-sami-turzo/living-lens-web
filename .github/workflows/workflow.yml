@@ -36,4 +36,4 @@ jobs:
       - name: Deploy to DigitalOcean Kubernetes
         run: kubectl -n beydu apply -f $GITHUB_WORKSPACE/k8s/deployment.yaml
       - name: Verify deployment
-        run: kubectl -n beydu rollout status deployment/living-lens-ui
+        run: kubectl -n beydu rollout status deployment/living-lens-ui-depl
