@@ -34,6 +34,6 @@ jobs:
       - name: Save DigitalOcean kubeconfig with short-lived credentials
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.CLUSTER_NAME }}
       - name: Deploy to DigitalOcean Kubernetes
-        run: kubectl -n beydu apply -f $GITHUB_WORKSPACE/config/deployment.yml
+        run: kubectl -n beydu apply -f $GITHUB_WORKSPACE/config/deployment.yaml
       - name: Verify deployment
         run: kubectl -n beydu rollout status deployment/living-lens-ui
