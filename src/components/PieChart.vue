@@ -61,15 +61,14 @@ export default {
             trigger: "item",
           },
           legend: {
-            top: "5%",
-            left: "center",
-            show: true,
+            orient: "vertical",
+            left: "left",
           },
           series: [
             {
               name: "Expenses From",
               type: "pie",
-              radius: ["40%", "70%"],
+              radius: ["40%", "100%"],
               avoidLabelOverlap: false,
               itemStyle: {
                 borderRadius: 10,
@@ -78,7 +77,13 @@ export default {
               },
               label: {
                 show: true,
-                position: "outside",
+                // position: "outside",
+                position: "inside",
+                formatter: "{d}%",
+                color: "black",
+                fontSize: 18,
+                percentPrecision: 0,
+
                 // formatter: params =>
                 //   `${params.data.name}: ${params.data.value}`,
               },
