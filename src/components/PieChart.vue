@@ -1,23 +1,24 @@
 <template>
   <v-container>
-    <apexchart
-      type="pie"
-      width="480"
-      :options="chartOptions"
-      :series="series"
-    ></apexchart>
+    <v-chart
+        v-if="
+        chartData &&
+        chartData.series &&
+        chartData.series[0] &&
+        chartData.series[0].data.length > 0
+      "
+        :option="echartOption"
+        autoresize
+        style="height: 300px"
+    ></v-chart>
   </v-container>
 </template>
 
 <script>
 import axios from "axios";
-import VueApexCharts from "vue3-apexcharts";
 
 export default {
   name: "PieChart",
-  components: {
-    apexchart: VueApexCharts,
-  },
   props: {
     cityId: {
       type: Number,
@@ -25,26 +26,8 @@ export default {
     },
   },
   data() {
-
     return {
-      series: [],
-      chartOptions : {
-          chart: {
-              width: 480,
-            },
-            labels: [],
-            responsive: [{
-              breakpoint: 480,
-              options: {
-                chart: {
-                  width: 200
-                },
-                legend: {
-                  position: 'bottom'
-                }
-              }
-            }]
-        },
+      chartData: {},
       categoryColors: {
         Utilities: "#5470C6",
         Childcare: "#40E0D0",
@@ -68,9 +51,10 @@ export default {
     async fetchChartData() {
       try {
         const response = await axios.get(
-          `https://api.ll.beydu.com/api/v1/get-piechartdata/${this.cityId}`
+            `https://api.ll.beydu.com/api/v1/get-piechartdata/${this.cityId}`
         );
         const dataForChart = response.data[0]; // Assuming the first item is what you need
+
         // Setting up ECharts options
         this.chartData = {
           tooltip: {
@@ -84,7 +68,7 @@ export default {
             {
               name: "Expenses From",
               type: "pie",
-              radius: ["40%", "100%"],
+              radius: ["50%", "100%"],
               avoidLabelOverlap: false,
               itemStyle: {
                 borderRadius: 10,
@@ -97,7 +81,7 @@ export default {
                 position: "inside",
                 formatter: "{d}%",
                 color: "black",
-                fontSize: 18,
+                fontSize: 16,
                 percentPrecision: 0,
 
                 // formatter: params =>
@@ -119,30 +103,10 @@ export default {
                 itemStyle: {
                   color: this.categoryColors[name] || "#999", // Fallback color
                 },
-              }))
-        var labels = []
-        for (let item of data){
-          this.series.push(item.value)
-          labels.push(item.name)
-        }
-        this.chartOptions = {
-          chart: {
-              width: 380,
+              })),
             },
-            labels: labels,
-            responsive: [{
-              breakpoint: 480,
-              options: {
-                chart: {
-                  width: 200
-                },
-                legend: {
-                  position: 'bottom'
-                }
-              }
-            }]
-        }
-
+          ],
+        };
       } catch (error) {
         console.error("Error fetching city data:", error);
       }
