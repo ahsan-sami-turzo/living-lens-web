@@ -131,3 +131,6 @@ dist
 yarn.lock
 vite.config.ts
 package-lock.json
+
+.vite
+.vite/*
