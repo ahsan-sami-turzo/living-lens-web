@@ -171,7 +171,7 @@
                                               @click="
                                                 changeDuration(
                                                   item,
-                                                  index + 1,
+                                                  index,
                                                   index2
                                                 )
                                               "

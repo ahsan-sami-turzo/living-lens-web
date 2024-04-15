@@ -2,24 +2,34 @@
   <v-container>
     <v-row>
       <v-col cols="4">
-        <v-select
-          clearable
-          label="Select Country"
-          v-model="selectedCountry"
-          :items="countries"
-          return-object
-          @input="countrySelected"
-        ></v-select>
+        <v-btn>
+                    {{ selectedCountry.title }}
+
+                    <v-menu activator="parent">
+                      <v-list style="max-height: 300px; overflow: auto">
+                        <v-list-item
+                          :ripple="false"
+                          v-for="(country, index) in countries"
+                          :key="country.value"
+                          :value="index"
+                        >
+                        <v-list-item-title @click="changeCountry(country)">{{
+                    country.title
+                  }}</v-list-item-title>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+                  </v-btn>
       </v-col>
     </v-row>
     <v-row cols="6" v-for="city in cities" :key="city.id">
       <v-col>
         <v-card>
           <v-card-title>{{ city.city_name }}</v-card-title>
-          <v-card-subtitle>Finland</v-card-subtitle>
+          <v-card-subtitle>{{selectedCountry.title}}</v-card-subtitle>
           <v-card-text>
             <v-row>
-              <v-col cols="6">
+              <v-col style="place-content: center;" cols="6">
                 <PieChart :cityId="city.id" />
               </v-col>
               <v-col cols="6">
@@ -29,7 +39,7 @@
           </v-card-text>
           <v-card-actions>
             <v-btn color="primary" @click="goToCityDetails(city)">
-              View Details
+              View City Details
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -56,7 +66,7 @@ export default {
       selectedCity: null,
       cities: [],
       countries: [],
-      selectedCountry: null,
+      selectedCountry: {title:'Germany',value:1},
     };
   },
   async created() {
@@ -70,15 +80,9 @@ export default {
         params: { id: city.id, city_name: city.city_name },
       });
     },
-    countrySelected() {
-      console.log("selected: ", this.selectedCountry);
-      if (this.selectedCountry) {
-        console.log("selected: ", this.selectedCountry);
-        this.fetchCities(this.selectedCountry.value);
-      } else {
-        console.log("empty: ", this.selectedCountry);
-        this.cities = [];
-      }
+    changeCountry(country) {
+      this.fetchCities(country.value);
+      this.selectedCountry = country;
     },
     async fetchCities(countryId) {
       try {
@@ -98,6 +102,7 @@ export default {
         response.data.map(data =>
           this.countries.push({ title: data.name, value: data.id })
         );
+        this.fetchCities(this.selectedCountry.value)
       } catch (error) {
         console.error("Error fetching countries:", error);
       }
