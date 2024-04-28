@@ -19,6 +19,7 @@
 <script>
 import axios from "axios";
 import VueApexCharts from "vue3-apexcharts";
+const BASE_URL = "http://localhost:8080/api/v1";
 
 export default {
   name: "CitiesData",
@@ -36,13 +37,11 @@ export default {
   methods: {
     async fetchCities() {
       try {
-        const response = await axios.get(
-          "https://api.ll.beydu.com/api/v1/get-cities/3"
-        );
+        const response = await axios.get("${BASE_URL}/get-cities/3");
         await Promise.all(
           response.data.map(async city => {
             const cityDataResponse = await axios.get(
-              `https://api.ll.beydu.com/api/v1/get-piechartdata/${city.id}`
+              `${BASE_URL}/get-piechartdata/${city.id}`
             );
             const dataForChart = cityDataResponse.data[0]; // Assuming each city has one data object
             this.cities.push({

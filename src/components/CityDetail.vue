@@ -43,6 +43,11 @@
         <v-row style="justify-content: space-between">
           <span style="font-size: 25px; font-weight: bold">
             {{ this.city.city_name }}
+            <v-tooltip text="Select data for comparison">
+              <template v-slot:activator="{ props }">
+                <v-btn v-bind="props" icon="mdi-help-circle"></v-btn>
+              </template>
+            </v-tooltip>
           </span>
           <v-btn style="width: auto !important" color="primary"
             >{{ currentCurrency.title }}
@@ -554,6 +559,7 @@ import axios from "axios";
 import VueApexCharts from "vue3-apexcharts";
 import Freecurrencyapi from "@everapi/freecurrencyapi-js";
 import { cloneDeep } from "lodash-es";
+const BASE_URL = "http://localhost:8080/api/v1";
 
 export default {
   name: "CityDetail",
@@ -956,16 +962,12 @@ export default {
     },
 
     async getCities(country) {
-      var data = await axios.get(
-        "https://api.ll.beydu.com/api/v1/get-cities/" + country.id
-      );
+      var data = await axios.get("${BASE_URL}/get-cities/" + country.id);
       this.cities = data.data;
     },
 
     async getCountries() {
-      var data = await axios.get(
-        "https://api.ll.beydu.com/api/v1/get-countries/"
-      );
+      var data = await axios.get("${BASE_URL}/get-countries/");
       this.countries = data.data;
     },
 
@@ -985,7 +987,7 @@ export default {
       for (let category of this.compareToCityCategories) {
         compareToCitySubCategories = (
           await axios.get(
-            "https://api.ll.beydu.com/api/v1/get-subcategories-by-city-and-category/" +
+            "${BASE_URL}/get-subcategories-by-city-and-category/" +
               city.id +
               "/" +
               category.id
@@ -1018,9 +1020,7 @@ export default {
       }
     },
     async getCategories() {
-      var data = await axios.get(
-        "https://api.ll.beydu.com/api/v1/get-categories/"
-      );
+      var data = await axios.get("${BASE_URL}/get-categories/");
       this.categories = data.data;
       this.compareToCityCategories = cloneDeep(this.categories);
       this.categories.splice(9, 1);
@@ -1032,7 +1032,7 @@ export default {
         if (this.categories[category.id - 1]["sub"] == null) {
           subCategories = (
             await axios.get(
-              "https://api.ll.beydu.com/api/v1/get-subcategories-by-city-and-category/" +
+              "${BASE_URL}/get-subcategories-by-city-and-category/" +
                 this.$route.params.id +
                 "/" +
                 category.id

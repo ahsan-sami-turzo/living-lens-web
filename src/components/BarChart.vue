@@ -11,7 +11,9 @@
 
 <script>
 import axios from "axios";
-import 'echarts/lib/component/legend';
+import "echarts/lib/component/legend";
+
+const BASE_URL = "http://localhost:8080/api/v1";
 
 export default {
   name: "BarChart",
@@ -83,7 +85,7 @@ export default {
     async fetchChartData() {
       try {
         const response = await axios.get(
-          `https://api.ll.beydu.com/api/v1/get-barchartdata/${this.cityId}`
+          `${BASE_URL}/get-barchartdata/${this.cityId}`
         );
         const data = response.data[0];
         this.barChartData.categories = Object.keys(data).filter(
